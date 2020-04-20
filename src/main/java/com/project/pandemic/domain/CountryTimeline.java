@@ -11,22 +11,22 @@ import javax.persistence.Id;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CountryHistory {	
+public class CountryTimeline {	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	@Column(name="country_name", unique = true)
+	@Column(name="country", unique = true)
 	private String name;
 	
 	@Embedded
 	private List<Timeline> timeline;
 	
-	public CountryHistory() {
+	public CountryTimeline() {
 		
 	}
 	
-	public CountryHistory(String name, List<Timeline> timeline) {
+	public CountryTimeline(String name, List<Timeline> timeline) {
 		super();
 		this.name = name;
 		this.timeline = timeline;

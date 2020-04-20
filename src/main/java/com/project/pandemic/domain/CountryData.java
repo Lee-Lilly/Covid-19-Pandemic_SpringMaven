@@ -1,6 +1,8 @@
 package com.project.pandemic.domain;
 
 import java.time.Instant;
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,20 +31,20 @@ public class CountryData {
 	@Transient
 	private Long updated;
 	
-	private Instant date;
+	private Date date;
 	
 	public CountryData() {
 		
 	}
 	
-	public CountryData(String country, Integer cases, Integer deaths, Integer critical, Integer recovered, Integer active, Instant date) {
+	public CountryData(String country, Integer cases, Integer deaths, Integer critical, Integer recovered, Integer active, Date date) {
 		this.country = country;
 		this.cases = cases;
 		this.deaths = deaths;
 		this.critical = critical;
 		this.recovered = recovered;
 		this.active = active;
-		this.date= date;
+		this.date = date;
 	}
 	
 	public String getCountry() {
@@ -101,14 +103,14 @@ public class CountryData {
 		this.updated = updated;
 	}
 	
-	public Instant getDate() {
-		return date;
+	public Date getDate() {
+		return date = Date.from(Instant.ofEpochMilli(updated));
 	}
 
-	public void setDate(Instant date) {
-		this.date = date;
+	public void setDate(Long updated) {
+		this.date = Date.from(Instant.ofEpochMilli(updated));
 	}
-		
+			
 	@Override
 	  public String toString() {
 		
@@ -119,13 +121,8 @@ public class CountryData {
 	        ", critical = " + critical + ' ' +
 	        ", recovered = " + recovered + ' ' +
 	        ", active = " + active + ' ' +
-	        ", date = " + Instant.ofEpochMilli(updated) +
+	        ", date = " + date +
 	        '}';
 	  }
 
-	
-
-	
-
-	
 }
