@@ -2,22 +2,19 @@ package com.project.pandemic.domain;
 
 import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.Embedded;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryTimeline {	
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
 	
-	@Column(name="country", unique = true)
 	private String name;
+	private String code;
+	private Integer population;
+	
+	@Embedded
+	private CountryLatest latest_data;
 	
 	@Embedded
 	private List<Timeline> timeline;
@@ -47,6 +44,29 @@ public class CountryTimeline {
 	public void setTimeline(List<Timeline> timeline) {
 		this.timeline = timeline;
 	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public Integer getPopulation() {
+		return population;
+	}
+
+	public void setPopulation(Integer population) {
+		this.population = population;
+	}
 	
+	public CountryLatest getLatest_data() {
+		return latest_data;
+	}
+
+	public void setLatest_data(CountryLatest latest_data) {
+		this.latest_data = latest_data;
+	}
 	
 }

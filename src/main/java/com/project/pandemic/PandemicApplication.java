@@ -31,10 +31,11 @@ public class PandemicApplication {
 	
 
 	@Bean
-	public CommandLineRunner pandemicApp(RestTemplate restTemplate, CountryDataRepository countryDataRepository, TimelineRepository timelineRepository, CountryInfoRepository countryInfoRepository) throws Exception {
-		return args -> { //declare: fetched data from various free API services, and all data are from John Hopkins University  
+	public CommandLineRunner pandemicApp(RestTemplate restTemplate, CountryDataRepository countryDataRepository, TimelineRepository timelineRepository) throws Exception {
+		return args -> { 
 			
-			//fetch today's Covid-19 data of all countries from "NOVEL COVID API" (https://corona.lmao.ninja)
+			//fetch today's data of all countries through "NOVEL COVID API" (https://corona.lmao.ninja)
+			//Data source: "Worldometers".
 			ResponseEntity<CountryData[]> response = restTemplate.getForEntity(
 					"https://corona.lmao.ninja/v2/countries", CountryData[].class);
 			CountryData[] dataList = response.getBody();
@@ -42,21 +43,25 @@ public class PandemicApplication {
 			for (CountryData countryData : dataList) {
 				
 				String country = countryData.getCountry();
+				String continent = countryData.getContinent();
 				Integer cases = countryData.getCases();
 				Integer deaths = countryData.getDeaths();
 				Integer critical = countryData.getCritical();
 				Integer recovered = countryData.getRecovered();
 				Integer active = countryData.getActive();
+				Integer tests = countryData.getTests();
+				CountryInfo countryInfo = countryData.getCountryInfo();
 				Date date = countryData.getDate();
 				
 				log.info(countryData.toString());	
 				
 				//save to database
-				countryDataRepository.save(new CountryData(country, cases, deaths, critical, recovered, active, date));				
+				countryDataRepository.save(new CountryData(country, continent, countryInfo, cases, deaths, critical, recovered, active, tests, date));				
 			
 			}
 			
-			//fetch global Covid-19 on timeline from "ABOUT-CORONA.NET" (https://about-corona.net/documentation)
+			//fetch global timeline from "ABOUT-CORONA.NET" (https://about-corona.net)
+			//Data source: "Johns Hopkins CSSE"
 			TimelineWrapper response1 = restTemplate.getForObject("https://corona-api.com/timeline", TimelineWrapper.class); 
 			List<Timeline> timelineList = response1.getData();
 			
@@ -74,31 +79,17 @@ public class PandemicApplication {
 				timelineRepository.save(new Timeline(confirmed, deaths, recovered, active, date));			
 			}
 			
-			//fetch country information from "REST COUNTRIES" (https://restcountries.eu/#api-endpoints-code)
-			ResponseEntity<CountryInfo[]> response3 = restTemplate.getForEntity(
-					"https://restcountries.eu/rest/v2/all", CountryInfo[].class);
-			CountryInfo[] countryList = response3.getBody();
-			
-			for (CountryInfo country: countryList) {
 				
-				String name = country.getName();
-				String alpha2Code = country.getAlpha2Code();
-				String alpha3Code = country.getAlpha3Code();
-				String region = country.getRegion();
-				String subregion = country.getSubregion();
-						
-				log.info(country.toString());
-				
-				countryInfoRepository.save(new CountryInfo(name, alpha2Code, alpha3Code, region, subregion));
-			}
-				
-			//fetch country Covid-19 on timeline from "ABOUT-CORONA.NET" (https://about-corona.net/documentation)
+			//fetch country timeline from "ABOUT-CORONA.NET" (https://about-corona.net)
 			//This is for searching country, not for save to database, will go controller part, need user to feed the ISO-2 code.
-			//e.g. https://corona-api.com/countries/{FR}
+			//e.g. https://corona-api.com/countries/{FR}, see CountryInfo
 			CountryTimelineWrapper response2 = restTemplate.getForObject("https://corona-api.com/countries/FR", CountryTimelineWrapper.class); 
 			CountryTimeline value = response2.getData();
 			String country = value.getName();
-			log.info(country);
+			Integer population = value.getPopulation();
+			CountryLatest latestData = value.getLatest_data();
+			log.info("[Country Name:] " + country + " [Population:] " + population);
+			log.info(latestData.toString());
 			
 			List<Timeline> timelines = value.getTimeline();				
 			

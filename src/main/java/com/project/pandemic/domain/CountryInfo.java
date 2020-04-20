@@ -1,92 +1,47 @@
 package com.project.pandemic.domain;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.Embeddable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@Entity
+@Embeddable
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryInfo {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-	
-	@Column(unique = true)
-	private String name;
-	
-	@Column(name = "ISO2", unique = true)
-	private String alpha2Code;
-	
-	@Column(name = "ISO3")
-	private String alpha3Code;
-	
-	private String region;
-	private String subregion;
+	@Column	
+	private String iso2;
+	@Column
+	private String iso3;
 	
 	public CountryInfo() {
 		
 	}
 
-	public CountryInfo(String name, String alpha2Code, String alpha3Code, String region, String subregion) {
+	public CountryInfo(String iso2, String iso3) {
 		super();
-		this.name = name;
-		this.alpha2Code = alpha2Code;
-		this.alpha3Code = alpha3Code;
-		this.region = region;
-		this.subregion = subregion;
-	}
-	
-	public String getName() {
-		return name;
+		this.iso2 = iso2;
+		this.iso3 = iso3;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getIso2() {
+		return iso2;
 	}
 
-	public String getAlpha2Code() {
-		return alpha2Code;
+	public void setIso2(String iso2) {
+		this.iso2 = iso2;
 	}
 
-	public void setAlpha2Code(String alpha2Code) {
-		this.alpha2Code = alpha2Code;
+	public String getIso3() {
+		return iso3;
 	}
 
-	public String getAlpha3Code() {
-		return alpha3Code;
-	}
-
-	public void setAlpha3Code(String alpha3Code) {
-		this.alpha3Code = alpha3Code;
-	}
-
-	public String getRegion() {
-		return region;
-	}
-
-	public void setRegion(String region) {
-		this.region = region;
-	}
-
-	public String getSubregion() {
-		return subregion;
-	}
-
-	public void setSubregion(String subregion) {
-		this.subregion = subregion;
+	public void setIso3(String iso3) {
+		this.iso3 = iso3;
 	}
 
 	@Override
 	public String toString() {
-		return "CountryInfo [name=" + name + ", alpha2Code=" + alpha2Code + ", alpha3Code=" + alpha3Code + ", region="
-				+ region + ", subregion=" + subregion + "]";
+		return "CountryInfo [iso2=" + iso2 + ", iso3=" + iso3 + "]";
 	}
-	
-	
-	
 	
 }

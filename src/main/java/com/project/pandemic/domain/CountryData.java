@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,12 +22,17 @@ public class CountryData {
 	
 	@Column(unique = true)
 	private String country;
+	private String continent;
+	
+	@Embedded
+	private CountryInfo countryInfo;
 	
 	private Integer cases;
 	private Integer deaths;
 	private Integer critical;
 	private Integer recovered;
 	private Integer active;
+	private Integer tests;
 	
 	@Transient
 	private Long updated;
@@ -37,14 +43,17 @@ public class CountryData {
 		
 	}
 	
-	public CountryData(String country, Integer cases, Integer deaths, Integer critical, Integer recovered, Integer active, Date date) {
+	public CountryData(String country, String continent, CountryInfo countryInfo, Integer cases, Integer deaths, Integer critical, Integer recovered, Integer active, Integer tests, Date date) {
 		this.country = country;
+		this.continent = continent;
 		this.cases = cases;
 		this.deaths = deaths;
 		this.critical = critical;
 		this.recovered = recovered;
 		this.active = active;
+		this.tests = tests;
 		this.date = date;
+		this.countryInfo = countryInfo;
 	}
 	
 	public String getCountry() {
@@ -53,6 +62,22 @@ public class CountryData {
 	
 	public void setCountry(String country) {
 		this.country = country;
+	}
+	
+	public String getContinent() {
+		return continent;
+	}
+
+	public void setContinent(String continent) {
+		this.continent = continent;
+	}
+	
+	public CountryInfo getCountryInfo() {
+		return countryInfo;
+	}
+	
+	public void setCountryInfo(CountryInfo countryInfo) {
+		this.countryInfo = countryInfo;
 	}
 	
 	public Integer getCases() {
@@ -95,6 +120,14 @@ public class CountryData {
 		this.active = active;
 	}
 	
+	public Integer getTests() {
+		return tests;
+	}
+
+	public void setTests(Integer tests) {
+		this.tests = tests;
+	}
+	
 	public Long getUpdated() {
 		return updated;
 	}
@@ -116,11 +149,13 @@ public class CountryData {
 		
 	    return "PandemicData{" +
 	        "country='" + country + ' ' +
+	        ", continent = " + continent + ' ' +
 	        ", cases=" + cases + ' ' + 
 	        ", deaths= " + deaths + ' ' +
 	        ", critical = " + critical + ' ' +
 	        ", recovered = " + recovered + ' ' +
 	        ", active = " + active + ' ' +
+	        ", tests = " + tests + ' ' +
 	        ", date = " + date +
 	        '}';
 	  }
