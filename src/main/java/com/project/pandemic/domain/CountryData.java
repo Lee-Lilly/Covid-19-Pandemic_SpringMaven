@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,11 +21,7 @@ public class CountryData {
 	
 	@Column(unique = true)
 	private String country;
-	private String continent;
-	
-	@Embedded
-	private CountryInfo countryInfo;
-	
+	private String continent;	
 	private Integer cases;
 	private Integer deaths;
 	private Integer critical;
@@ -43,7 +38,7 @@ public class CountryData {
 		
 	}
 	
-	public CountryData(String country, String continent, CountryInfo countryInfo, Integer cases, Integer deaths, Integer critical, Integer recovered, Integer active, Integer tests, Date date) {
+	public CountryData(String country, String continent, Integer cases, Integer deaths, Integer critical, Integer recovered, Integer active, Integer tests, Date date) {
 		this.country = country;
 		this.continent = continent;
 		this.cases = cases;
@@ -53,7 +48,6 @@ public class CountryData {
 		this.active = active;
 		this.tests = tests;
 		this.date = date;
-		this.countryInfo = countryInfo;
 	}
 	
 	public String getCountry() {
@@ -71,15 +65,7 @@ public class CountryData {
 	public void setContinent(String continent) {
 		this.continent = continent;
 	}
-	
-	public CountryInfo getCountryInfo() {
-		return countryInfo;
-	}
-	
-	public void setCountryInfo(CountryInfo countryInfo) {
-		this.countryInfo = countryInfo;
-	}
-	
+		
 	public Integer getCases() {
 		return cases;
 	}

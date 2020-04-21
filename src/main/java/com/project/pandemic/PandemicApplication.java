@@ -31,7 +31,7 @@ public class PandemicApplication {
 	
 
 	@Bean
-	public CommandLineRunner pandemicApp(RestTemplate restTemplate, CountryDataRepository countryDataRepository, TimelineRepository timelineRepository) throws Exception {
+	public CommandLineRunner pandemicApp(RestTemplate restTemplate, CountryDataRepository countryDataRepository, TimelineRepository timelineRepository, CountryUpdatesRepository countryUpdatesRepository) throws Exception {
 		return args -> { 
 			
 			//fetch today's data of all countries through "NOVEL COVID API" (https://corona.lmao.ninja)
@@ -50,13 +50,13 @@ public class PandemicApplication {
 				Integer recovered = countryData.getRecovered();
 				Integer active = countryData.getActive();
 				Integer tests = countryData.getTests();
-				CountryInfo countryInfo = countryData.getCountryInfo();
+//				CountryInfo countryInfo = countryData.getCountryInfo();
 				Date date = countryData.getDate();
 				
 				log.info(countryData.toString());	
 				
 				//save to database
-				countryDataRepository.save(new CountryData(country, continent, countryInfo, cases, deaths, critical, recovered, active, tests, date));				
+				countryDataRepository.save(new CountryData(country, continent, cases, deaths, critical, recovered, active, tests, date));				
 			
 			}
 			
@@ -79,17 +79,32 @@ public class PandemicApplication {
 				timelineRepository.save(new Timeline(confirmed, deaths, recovered, active, date));			
 			}
 			
+			//fetch calculated updates for all countries from "ABOUT-CORONA.NET" (https://about-corona.net)
+			CountryUpdatesWrapper response2 = restTemplate.getForObject("https://corona-api.com/countries", CountryUpdatesWrapper.class);
+			List<CountryUpdates> countryUpdateList = response2.getData();
+			
+			for (CountryUpdates countryUpdate: countryUpdateList) {
 				
+				String name = countryUpdate.getName();
+				String code = countryUpdate.getCode();
+				Integer population = countryUpdate.getPopulation();
+				Date date = countryUpdate.getUpdated_at();
+				CountryLatest latestData = countryUpdate.getLatest_data();
+				
+				log.info(countryUpdate.toString());
+				
+				//save to database
+				countryUpdatesRepository.save(new CountryUpdates(name, code, population, date, latestData));
+				
+			}
+					
 			//fetch country timeline from "ABOUT-CORONA.NET" (https://about-corona.net)
-			//This is for searching country, not for save to database, will go controller part, need user to feed the ISO-2 code.
+			//This is for searching specific country, will go controller part, need user to feed the ISO-2 code.
 			//e.g. https://corona-api.com/countries/{FR}, see CountryInfo
-			CountryTimelineWrapper response2 = restTemplate.getForObject("https://corona-api.com/countries/FR", CountryTimelineWrapper.class); 
-			CountryTimeline value = response2.getData();
+			CountryTimelineWrapper response3 = restTemplate.getForObject("https://corona-api.com/countries/FR", CountryTimelineWrapper.class); 
+			CountryTimeline value = response3.getData();
 			String country = value.getName();
-			Integer population = value.getPopulation();
-			CountryLatest latestData = value.getLatest_data();
-			log.info("[Country Name:] " + country + " [Population:] " + population);
-			log.info(latestData.toString());
+			log.info("[Country Name:] " + country);
 			
 			List<Timeline> timelines = value.getTimeline();				
 			

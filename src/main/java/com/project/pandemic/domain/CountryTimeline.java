@@ -10,12 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class CountryTimeline {	
 	
 	private String name;
-	private String code;
-	private Integer population;
-	
-	@Embedded
-	private CountryLatest latest_data;
-	
+
 	@Embedded
 	private List<Timeline> timeline;
 	
@@ -44,29 +39,5 @@ public class CountryTimeline {
 	public void setTimeline(List<Timeline> timeline) {
 		this.timeline = timeline;
 	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public Integer getPopulation() {
-		return population;
-	}
-
-	public void setPopulation(Integer population) {
-		this.population = population;
-	}
-	
-	public CountryLatest getLatest_data() {
-		return latest_data;
-	}
-
-	public void setLatest_data(CountryLatest latest_data) {
-		this.latest_data = latest_data;
-	}
-	
+		
 }
