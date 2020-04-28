@@ -106,7 +106,7 @@ public class PandemicApplication {
 			String country = value.getName();
 			log.info("[Country Name:] " + country);
 			
-			List<Timeline> timelines = value.getTimeline();				
+			List<Timeline> timelines = value.getTimeline();	
 			
 			for(Timeline timeline: timelines) {
 				
@@ -115,11 +115,11 @@ public class PandemicApplication {
 //				Integer recovered = timeline.getRecovered();
 //				Integer active = timeline.getActive();
 //				Date date = timeline.getDate();
-			
-				log.info(timeline.toString());
+				
+				log.info(timeline.toString());	
 				
 			}
-												
+			
 		};
 	}
 }

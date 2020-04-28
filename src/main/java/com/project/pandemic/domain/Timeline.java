@@ -11,8 +11,8 @@ import javax.persistence.Id;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Embeddable
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Timeline {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
