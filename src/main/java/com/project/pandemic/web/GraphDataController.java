@@ -1,16 +1,18 @@
 package com.project.pandemic.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
+import com.google.gson.Gson;
 import com.project.pandemic.domain.CountryData;
 import com.project.pandemic.domain.CountryDataRepository;
 import com.project.pandemic.domain.Timeline;
@@ -30,7 +32,7 @@ public class GraphDataController {
 //	private CountryUpdatesRepository countryUpdatesRepository;
 	
 	@GetMapping({"/", "/global"})
-	public String globalCombined (Model model) {
+	public String global(Model model) {
 		
 		//Timeline World-wide
 		List<Timeline> timelines = timelineRepository.findByOrderByDate();
@@ -39,32 +41,27 @@ public class GraphDataController {
 		List<Integer> activeData = new ArrayList<Integer>();	//initialise an empty list for active			
 		List<Integer> deathData = new ArrayList<Integer>();		//initialise an empty list for death
 		List<Integer> recoveredData = new ArrayList<Integer>();	//initialise an empty list for recovered
-		List<Integer> confirmedData = new ArrayList<Integer>();	//initialise an empty list for confirmed
 		
 		for (Timeline timeline : timelines) {
 			Date date = timeline.getDate();
 			Integer active = timeline.getActive();
 			Integer deaths = timeline.getDeaths();
 			Integer recovered = timeline.getRecovered();
-			Integer confirmed = timeline.getConfirmed();
 			
 			dates.add(date);
 			activeData.add(active);
 			deathData.add(deaths);
 			recoveredData.add(recovered);
-			confirmedData.add(confirmed);
 		}
 		System.out.println(dates);
 		System.out.println(activeData);
 		System.out.println(deathData);
 		System.out.println(recoveredData);
-		System.out.println(confirmedData);
-		
-		model.addAttribute("dates", dates);
+					
+		model.addAttribute("dates", new Gson().toJson(dates));
 		model.addAttribute("active", activeData);
 		model.addAttribute("deaths", deathData);
 		model.addAttribute("recovered", recoveredData);
-		model.addAttribute("confirmed", confirmedData);
 		
 		//Global total amount - the latest updates
 		int last = timelines.size() -1;
@@ -78,10 +75,14 @@ public class GraphDataController {
 		System.out.println(recoveredLast);
 		
 		model.addAttribute("totalActive", activeLast);
-		model.addAttribute("totalDeath", deathsLast);
-		model.addAttribute("totalRecoverd", recoveredLast);
-	
-		// Continental view
+		model.addAttribute("totalDeaths", deathsLast);
+		model.addAttribute("totalRecovered", recoveredLast);
+		
+		return "global"; 
+	}
+		
+	@GetMapping("/continent") //continent view
+	public String continent(Model model) {
 		List<CountryData> europe = countryDataRepository.findByContinent("Europe");
 		List<CountryData> asia = countryDataRepository.findByContinent("Asia");
 		List<CountryData> africa =countryDataRepository.findByContinent("Africa");
@@ -89,73 +90,204 @@ public class GraphDataController {
 		List<CountryData> north_america =countryDataRepository.findByContinent("North America");
 		List<CountryData> south_america =countryDataRepository.findByContinent("South America");
 			
-		//create a HashMap of country and data for Europe
-		HashMap<String, Integer> activeEU = new HashMap<String, Integer>();
+		//create a Map of country and data for Europe
+		Map<String, Integer> casesEU = new HashMap<String, Integer>();
+		
+		//create aggregated sum 
+		int sumActiveEU = 0;
+		int sumDeathsEU = 0;
+		int	sumRecoveredEU = 0;
+		int sumTestsEU =0;
 		
 		for(CountryData country : europe ) {
 			String name = country.getCountry();
-			Integer active = country.getActive();	
-			activeEU.put(name, active);	
+			Integer cases = country.getCases();	
+			casesEU.put(name, cases);	
+			
+			int active = country.getActive();
+			sumActiveEU += active;
+			
+			int deaths = country.getDeaths();
+			sumDeathsEU += deaths;
+			
+			int recovered = country.getRecovered();
+			sumRecoveredEU += recovered;	
+			
+			int tested = country.getTests();
+			sumTestsEU += tested;
 		}
-		model.addAttribute("europeList", activeEU);
-		System.out.println(activeEU);
+		model.addAttribute("europeList", casesEU);
+		System.out.println(casesEU);
 				
-		//create a HashMap of country and data for Asia
-		HashMap<String, Integer> activeAsia = new HashMap<String, Integer>();			
-							
+		//create a Map of country and data for Asia
+		Map<String, Integer> casesAsia = new HashMap<String, Integer>();			
+		
+		//create aggregated sum 
+		int sumActiveAsia = 0;
+		int sumDeathsAsia = 0;
+		int	sumRecoveredAsia = 0;
+		int sumTestsAsia =0;
+		
 		for(CountryData country : asia ) {
 			String name = country.getCountry();
-			Integer active = country.getActive();				
-			activeAsia.put(name, active);	
+			Integer cases = country.getCases();				
+			casesAsia.put(name, cases);	
+			
+			int active = country.getActive();
+			sumActiveAsia += active;
+			
+			int deaths = country.getDeaths();
+			sumDeathsAsia += deaths;
+			
+			int recovered = country.getRecovered();
+			sumRecoveredAsia += recovered;	
+			
+			int tested = country.getTests();
+			sumTestsAsia += tested;
 		}		
-		model.addAttribute("asiaList", activeAsia);
-		System.out.println(activeAsia);		
+		model.addAttribute("asiaList", casesAsia);
 		
-		//create a HashMap of country and data for Africa
-		HashMap<String, Integer> activeAfrica = new HashMap<String, Integer>();	
+		System.out.println(casesAsia);		
+		
+		//create a Map of country and data for Africa
+		Map<String, Integer> casesAfrica = new HashMap<String, Integer>();	
+		
+		//create aggregated sum 
+		int sumActiveAfrica = 0;
+		int sumDeathsAfrica= 0;
+		int	sumRecoveredAfrica = 0;
+		int sumTestsAfrica =0;
 		
 		for(CountryData country : africa ) {
 			String name = country.getCountry();
-			Integer active = country.getActive();			
-			activeAfrica.put(name, active);			
+			Integer cases = country.getCases();			
+			casesAfrica.put(name, cases);	
+			
+			int active = country.getActive();
+			sumActiveAfrica += active;
+			
+			int deaths = country.getDeaths();
+			sumDeathsAfrica += deaths;
+			
+			int recovered = country.getRecovered();
+			sumRecoveredAfrica += recovered;	
+			
+			int tested = country.getTests();
+			sumTestsAfrica += tested;
+			
 		}	
-		model.addAttribute("africaList", activeAfrica);
-		System.out.println(activeAfrica);
+		model.addAttribute("africaList", casesAfrica);
+		System.out.println(casesAfrica);
 						
-		//create a HashMap of country and data for Oceania
-		HashMap<String, Integer> activeOceania = new HashMap<String, Integer>();	
-				
+		//create a Map of country and data for Oceania
+		Map<String, Integer> casesOceania = new HashMap<String, Integer>();	
+		
+		//create aggregated sum 
+		int sumActiveOceania = 0;
+		int sumDeathsOceania= 0;
+		int	sumRecoveredOceania = 0;
+		int sumTestsOceania =0;
+		
 		for(CountryData country : oceania ) {
 			String name = country.getCountry();
-			Integer active = country.getActive();			
-			activeOceania.put(name, active);		
+			Integer cases = country.getCases();			
+			casesOceania.put(name, cases);	
+			
+			int active = country.getActive();
+			sumActiveOceania += active;
+				
+			int deaths = country.getDeaths();
+			sumDeathsOceania += deaths;
+			
+			int recovered = country.getRecovered();
+			sumRecoveredOceania += recovered;	
+			
+			int tested = country.getTests();
+			sumTestsOceania += tested;
+			
 		}	
-		model.addAttribute("oceaniaList", activeOceania);
-		System.out.println(activeOceania);
+		model.addAttribute("oceaniaList", casesOceania);
+		System.out.println(casesOceania);
 							
-		//create a HashMap of country and data for North America
-		HashMap<String, Integer> activeNorthAmerica = new HashMap<String, Integer>();	
-						
+		//create a Map of country and data for North America
+		Map<String, Integer> casesNorthAmerica = new HashMap<String, Integer>();	
+		
+		//create aggregated sum 
+		int sumActiveNorthAmerica = 0;
+		int sumDeathsNorthAmerica= 0;
+		int	sumRecoveredNorthAmerica= 0;
+		int sumTestsNorthAmerica =0;
+		
 		for(CountryData country : north_america ) {
 			String name = country.getCountry();
-			Integer active = country.getActive();
-			activeNorthAmerica.put(name, active);		
+			Integer cases = country.getCases();
+			casesNorthAmerica.put(name, cases);	
+			
+			int active = country.getActive();
+			sumActiveNorthAmerica += active;
+				
+			int deaths = country.getDeaths();
+			sumDeathsNorthAmerica += deaths;
+			
+			int recovered = country.getRecovered();
+			sumRecoveredNorthAmerica += recovered;
+			
+			int tested = country.getTests();
+			sumTestsNorthAmerica += tested;
 		}
-		model.addAttribute("northAmericaList", activeNorthAmerica);		
-		System.out.println(activeNorthAmerica);
+		model.addAttribute("northAmericaList", casesNorthAmerica);	
+		System.out.println(casesNorthAmerica);
 						
-		//create a HashMap object of country and data for South America
-		HashMap<String, Integer> activeSouthAmerica = new HashMap<String, Integer>();	
-								
+		//create a Map object of country and data for South America
+		Map<String, Integer> casesSouthAmerica = new HashMap<String, Integer>();	
+		
+		//create aggregated sum 
+		int sumActiveSouthAmerica = 0;
+		int sumDeathsSouthAmerica= 0;
+		int	sumRecoveredSouthAmerica= 0;
+		int sumTestsSouthAmerica =0;
+		
 		for(CountryData country : south_america ) {
 			String name = country.getCountry();
-			Integer active = country.getActive();		
-			activeSouthAmerica.put(name, active);
+			Integer cases = country.getCases();		
+			casesSouthAmerica.put(name, cases);
+			
+			int active = country.getActive();
+			sumActiveSouthAmerica += active;
+				
+			int deaths = country.getDeaths();
+			sumDeathsSouthAmerica += deaths;
+			
+			int recovered = country.getRecovered();
+			sumRecoveredSouthAmerica += recovered;
+			
+			int tested = country.getTests();
+			sumTestsSouthAmerica += tested;
 		}
-		model.addAttribute("southAmericaList", activeSouthAmerica);		
-		System.out.println(activeSouthAmerica);
+		model.addAttribute("southAmericaList", casesSouthAmerica);	
+		System.out.println(casesSouthAmerica);
 	
-		return "global"; 
+		List<Integer> activeContinent = Arrays.asList(sumActiveEU, 
+				sumActiveAsia, sumActiveAfrica, sumActiveOceania, 
+				sumActiveNorthAmerica, sumActiveSouthAmerica);
+		model.addAttribute("active", activeContinent);
+		
+		List<Integer> deathsContinent = Arrays.asList(sumDeathsEU, 
+				sumDeathsAsia, sumDeathsAfrica, sumDeathsOceania, 
+				sumDeathsNorthAmerica, sumDeathsSouthAmerica);
+		model.addAttribute("deaths", deathsContinent);
+		
+		List<Integer> recoveredContinent = Arrays.asList(sumRecoveredEU, 
+				sumRecoveredAsia, sumRecoveredAfrica, sumRecoveredOceania, 
+				sumRecoveredNorthAmerica, sumRecoveredSouthAmerica);
+		model.addAttribute("recovered", recoveredContinent);
+		
+		List<Integer> testedContinent = Arrays.asList(sumTestsEU, 
+				sumTestsAsia, sumTestsAfrica, sumTestsOceania, 
+				sumTestsNorthAmerica, sumTestsSouthAmerica);
+		model.addAttribute("tested", testedContinent);
+		
+		return "continent"; 
 	}
 //	
 //	@GetMapping("/Countries/{code}") //search function user input specific country code
