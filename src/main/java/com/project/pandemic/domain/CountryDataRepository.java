@@ -10,5 +10,7 @@ public interface CountryDataRepository extends CrudRepository<CountryData, Long>
 	List<CountryData> findByOrderByCountry();
 	
 	List<CountryData> findByContinent(String continent);
+	
+	CountryData findByCountry(String country);
 
 }

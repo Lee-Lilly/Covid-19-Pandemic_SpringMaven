@@ -123,7 +123,7 @@ public class CountryData {
 	}
 	
 	public Date getDate() {
-		return date = Date.from(Instant.ofEpochMilli(updated));
+		return date;
 	}
 
 	public void setDate(Long updated) {

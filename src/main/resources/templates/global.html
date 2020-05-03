@@ -6,6 +6,7 @@
 	<script src="https://kit.fontawesome.com/0fa32f6844.js"></script>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://code.highcharts.com/css/highcharts.css" />
+	<link rel="stylesheet" type="text/css" href="css/some_style.css"/>
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
 	<script src="https://code.highcharts.com/highcharts.js"></script>
 	<script src="https://code.highcharts.com/highcharts-more.js"></script>
@@ -14,29 +15,62 @@
 	<script src="https://code.highcharts.com/modules/accessibility.js"></script>
 </head>
 <body>
-	<nav class="navbar navbar-expand-sm navbar-light justify-content-between" style="background-color: #e3f2fd;">
-         <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="nav navbar-nav">
-                   <li class="nav-item active">
-                         <a th:href="@{/global}"  class="nav-link">Global</a>
-                    </li> 
-                     <li class="nav-item active">
-                         <a th:href="@{/continent}"  class="nav-link">Continent</a>
-                    </li>   
-                     <li class="nav-item active">
-                         <a th:href="@{/table}"  class="nav-link">Statistics</a>
-                    </li>        			  				            			  				     
-                	</ul>
-                </div>
-                <form th:action="@{/search}" class="form-inline  ml-auto">
-		   			<input type="text" placeholder="Search ..." th:name="input">
-					<button type="submit"><i class="fa fa-search"></i></button>
-				</form>       
-            </nav>
-
-   <figure class="highcharts-figure">
-     	<div id ="global-pie"></div>
-   </figure> 
+	<div class = "container-fluid">
+		<nav class="navbar navbar-expand-sm navbar-light justify-content-between" style="background-color: #e3f2fd;">
+	         <div class="collapse navbar-collapse" id="navbarNav">
+	              <ul class="nav navbar-nav">
+	                   <li class="nav-item active">
+	                         <a th:href="@{/global}"  class="nav-link">Global</a>
+	                    </li> 
+	                     <li class="nav-item active">
+	                         <a th:href="@{/continent}"  class="nav-link">Continent</a>
+	                    </li>   
+	                     <li class="nav-item active">
+	                         <a th:href="@{/countries}"  class="nav-link">Countries</a>
+	                    </li>        			  				            			  				     
+	               	</ul>
+	         </div>
+	         <form th:action="@{/search}" class="form-inline  ml-auto">
+			   			<input type="text" placeholder="Search ..." th:name="input">
+						<button type="submit"><i class="fa fa-search"></i></button>
+			</form>       
+	    </nav>
+            
+		<div class="row" style="margin-bottom:10px">
+			<div class="col-md-6" style="margin-top:20px">		
+			        <div id="global-pie" style="width:100%; height:300px;"></div> 
+			        	<p th:inline="text" th:align="center" ><strong>Total Confirmed: [[${totalConfirmed}]]</strong> </p>  
+			        	<p th:inline="text" th:align="center" ><strong> Total Tests: [[${totalTests}]]</strong> </p> 		  			
+		  	</div>  	
+		  
+	    	<div class="col-md-6" style="margin-top:20px">  	
+	       		<div id="global-pie-tests" style="width:100%; height:360px;"></div>
+	   		</div>
+		</div> 	
+		<div class="row" style="margin-bottom:5px">
+			<div class="col-md-12" style="margin-top:5px">	
+				<div id ="global-timeline" style="width:100%; height:100%;"></div>
+			</div>
+	   </div>
+	   
+	   <p class="content" th:inline="text" style ="font-style: italic">
+			* Data Source: <a href="https://corona.lmao.ninja">The NovelCOVID API</a> and  <a href="https://about-corona.net">ABOUT-CORONA.NET</a><br>
+			* Updated at: [[${latestDate}]]
+		</p>
+	   
+	</div> 
+	
+	<!-- testing data from backend to Js -->	 
+   <!--script th:inline="javascript">
+	var active = /*[[${active}]]*/[];
+	alert(active);
+	var recovered = /*[[${recovered}]]*/[];
+	alert(recovered);
+	var dates = /*[[${dates}]]*/[];
+	alert(dates);	
+	var deaths = /*[[${deaths}]]*/ [];
+	alert(deaths);
+	</script-->
    
    <script th:inline="javascript">
 	/*<![CDATA[*/
@@ -46,30 +80,32 @@
 			    type: 'pie'
 			  },
 			  title: {
-			    text:  'COVID-19 Global Today'
+			    text: "Total Cases Worldwide"
 			  },
-			  tooltip: {
-	                pointFormat: "{point.y:,.0f}"
-	            },
+			  credits: false,
 	           plotOptions: {
 	                pie: {
 	                    allowPointSelect: true,
-	                    depth: 35
+	                    depth: 5,
+	                    dataLabels: {
+	                        enabled: true,
+	                        format: '<b>{point.name}</b>:<br>{point.percentage:.1f} %<br>',
+	                    }
 	                }
 	            },
 			  series: [{
-			    name: 'Cases',
+				name:'total',
 			    colorByPoint: true,
 			    data: [{
-    				name: 'active',
+    				name: 'Active',
     		     	y: 	/*[[${totalActive}]]*/ [],
     				
     		 	}, {
-    		     	name: 'deaths',
+    		     	name: 'Deaths',
     		      	y: 	/*[[${totalDeaths}]]*/ [],
     		      
     		  	}, {
-    		      	name: 'recovered',
+    		      	name: 'Recovered',
     		      	y:  /*[[${totalRecovered}]]*/[],
     		     	      			
     			}]
@@ -77,9 +113,105 @@
 			});
 	})
 	/*]]>*/
-	</script>   
+	</script>   	
 	
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+	$(function () {
+		Highcharts.chart('global-pie-tests', {
+			  chart: {
+			    type: 'pie'
+			  },
+			  title: {
+			    text: "Confirmed vs Total Tests"
+			  },
+			  credits: false,
+	           plotOptions: {
+	                pie: {
+	                    allowPointSelect: true,
+	                    depth: 5,
+	                    dataLabels: {
+	                        enabled: true,
+	                        format: '<b>{point.name}</b>:{point.percentage:.1f} %',
+	                    }
+	                }
+	            },
+			  series: [{
+				name: 'total',
+			  	colorByPoint: true,
+			  	data: [{
+    				name: 'Active',
+    		     	y: 	/*[[${totalActive}]]*/ [],
+    				
+    		 	}, {
+    		     	name: 'Deaths',
+    		      	y: 	/*[[${totalDeaths}]]*/ [],
+    		      
+    		  	}, {
+    		      	name: 'Recovered',
+    		      	y:  /*[[${totalRecovered}]]*/[],
+    		     	      			
+    			},{ name: 'Tested Non-confirmed',
+    		      	y:  /*[[${testedNonCase}]]*/[],
+    		     	      			
+    			}]
+			  }]
+			});
+	})
+	/*]]>*/
+	</script>   	
 	
-	
+	<script th:inline="javascript">
+	/*<![CDATA[*/
+	$(function () {
+		Highcharts.chart('global-timeline', {
+			chart: {
+			    type: 'area'
+		  	},
+		  	title: {
+			    text: "Worldwide Timeline"
+		  	},
+		  	credits: false,
+		  	xAxis: {
+			     categories: /*[[${dates}]]*/[]
+		 	},
+		 	yAxis: {
+       	        title: {
+	              text: 'Cases'
+       		   	},	 		
+	          },
+	          tooltip: {
+	        	  	split:true,
+	        	    headerFormat: '<b>{point.x}</b><br/>',
+	        	    pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+	        	},	  
+	           plotOptions: {
+	        	   area: {
+	        		      stacking: 'normal',
+	        		      dataLabels: {
+	        		        enabled: true,
+	        		      },
+			        	 lineColor: '#666666',
+			             lineWidth: 1,
+			             marker: {
+			               lineWidth: 1,
+			               lineColor: '#666666'
+			             }
+	        		  }
+	            },	          
+			  series: [{
+    				name: 'Active',
+    		     	data: /*[[${active}]]*/ [],		
+    		 	}, {
+    		     	name: 'Deaths',
+    		      	data: /*[[${deaths}]]*/ [],
+    		  	}, {
+    		      	name: 'Recovered',
+    		      	data:  /*[[${recovered}]]*/[],	      			
+    			}]
+			});
+	})
+	/*]]>*/
+	</script>   	
 </body>
 </html>

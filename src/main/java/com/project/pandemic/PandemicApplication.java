@@ -51,6 +51,8 @@ public class PandemicApplication {
 				Integer active = countryData.getActive();
 				Integer tests = countryData.getTests();
 //				CountryInfo countryInfo = countryData.getCountryInfo();
+				Long updated = countryData.getUpdated();
+				countryData.setDate(updated);
 				Date date = countryData.getDate();
 				
 				log.info(countryData.toString());	
@@ -90,11 +92,11 @@ public class PandemicApplication {
 				Integer population = countryUpdate.getPopulation();
 				Date date = countryUpdate.getUpdated_at();
 				CountryLatest latestData = countryUpdate.getLatest_data();
-				
-				log.info(countryUpdate.toString());
+				TodayNews today = countryUpdate.getToday();
+			//	log.info(countryUpdate.toString());
 				
 				//save to database
-				countryUpdatesRepository.save(new CountryUpdates(name, code, population, date, latestData));
+				countryUpdatesRepository.save(new CountryUpdates(name, code, population, date, latestData, today));
 				
 			}
 					
@@ -107,17 +109,15 @@ public class PandemicApplication {
 			log.info("[Country Name:] " + country);
 			
 			List<Timeline> timelines = value.getTimeline();	
-			
-			for(Timeline timeline: timelines) {
-				
+					
+			for(Timeline timeline: timelines) {			
 //				Integer confirmed = timeline.getConfirmed();
 //				Integer deaths = timeline.getDeaths();
 //				Integer recovered = timeline.getRecovered();
 //				Integer active = timeline.getActive();
 //				Date date = timeline.getDate();
 				
-				log.info(timeline.toString());	
-				
+				log.info(timeline.toString());					
 			}
 			
 		};

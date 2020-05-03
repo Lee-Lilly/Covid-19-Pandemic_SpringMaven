@@ -28,18 +28,28 @@ public class CountryUpdates {
 	@Embedded
 	private CountryLatest latest_data;
 	
+	@Embedded 
+	private TodayNews today;
+	
 	public CountryUpdates() {
 		
 	}
-	public CountryUpdates(String name, String code, Integer population, Date updated_at, CountryLatest latest_data) {
+	public CountryUpdates(String name, String code, Integer population, Date updated_at, CountryLatest latest_data, TodayNews today) {
 		super();
 		this.name = name;
 		this.code = code;
 		this.population = population;
 		this.updated_at = updated_at;
 		this.latest_data = latest_data;
+		this.today = today;
 	}
 		
+	public TodayNews getToday() {
+		return today;
+	}
+	public void setToday(TodayNews today) {
+		this.today = today;
+	}
 	public String getName() {
 		return name;
 	}

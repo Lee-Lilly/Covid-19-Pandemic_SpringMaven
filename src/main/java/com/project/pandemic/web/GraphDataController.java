@@ -1,5 +1,7 @@
 package com.project.pandemic.web;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -12,11 +14,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.google.gson.Gson;
 import com.project.pandemic.domain.CountryData;
 import com.project.pandemic.domain.CountryDataRepository;
+import com.project.pandemic.domain.CountryUpdates;
 import com.project.pandemic.domain.Timeline;
-//import com.project.pandemic.domain.CountryUpdatesRepository;
+import com.project.pandemic.domain.CountryUpdatesRepository;
 import com.project.pandemic.domain.TimelineRepository;
 
 
@@ -28,19 +30,21 @@ public class GraphDataController {
 	@Autowired
 	private TimelineRepository timelineRepository;
 	
-//	@Autowired
-//	private CountryUpdatesRepository countryUpdatesRepository;
+	@Autowired
+	private CountryUpdatesRepository countryUpdatesRepository;
+	
+	DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
+	DateFormat df_date = new SimpleDateFormat("yyyy-MM-dd");
 	
 	@GetMapping({"/", "/global"})
 	public String global(Model model) {
-		
 		//Timeline World-wide
 		List<Timeline> timelines = timelineRepository.findByOrderByDate();
 			
-		List<Date> dates = new ArrayList<Date>();				//initialise an empty list for dates				
-		List<Integer> activeData = new ArrayList<Integer>();	//initialise an empty list for active			
-		List<Integer> deathData = new ArrayList<Integer>();		//initialise an empty list for death
-		List<Integer> recoveredData = new ArrayList<Integer>();	//initialise an empty list for recovered
+		List<String> dates = new ArrayList<String>();			//initialise a list for dates in String	
+		List<Integer> activeData = new ArrayList<Integer>();	//initialise a list for active			
+		List<Integer> deathData = new ArrayList<Integer>();		//initialise a list for death
+		List<Integer> recoveredData = new ArrayList<Integer>();	//initialise a list for recovered
 		
 		for (Timeline timeline : timelines) {
 			Date date = timeline.getDate();
@@ -48,7 +52,7 @@ public class GraphDataController {
 			Integer deaths = timeline.getDeaths();
 			Integer recovered = timeline.getRecovered();
 			
-			dates.add(date);
+			dates.add(df_date.format(date)); //prepare the date format for timeline graph
 			activeData.add(active);
 			deathData.add(deaths);
 			recoveredData.add(recovered);
@@ -58,7 +62,7 @@ public class GraphDataController {
 		System.out.println(deathData);
 		System.out.println(recoveredData);
 					
-		model.addAttribute("dates", new Gson().toJson(dates));
+		model.addAttribute("dates", dates);
 		model.addAttribute("active", activeData);
 		model.addAttribute("deaths", deathData);
 		model.addAttribute("recovered", recoveredData);
@@ -66,10 +70,13 @@ public class GraphDataController {
 		//Global total amount - the latest updates
 		int last = timelines.size() -1;
 		Timeline lastLine = timelines.get(last);
+		Date latestDate = lastLine.getDate();
 		Integer activeLast = lastLine.getActive();
 		Integer deathsLast = lastLine.getDeaths();
 		Integer recoveredLast = lastLine.getRecovered();
-	
+		Integer confirmed = lastLine.getConfirmed();
+					
+		System.out.println(df.format(latestDate));
 		System.out.println(activeLast);
 		System.out.println(deathsLast);
 		System.out.println(recoveredLast);
@@ -77,7 +84,22 @@ public class GraphDataController {
 		model.addAttribute("totalActive", activeLast);
 		model.addAttribute("totalDeaths", deathsLast);
 		model.addAttribute("totalRecovered", recoveredLast);
-		
+		model.addAttribute("latestDate", df.format(latestDate));
+		model.addAttribute("totalConfirmed",confirmed);
+		//Global total amount -tests
+		List<CountryData> all = countryDataRepository.findByOrderByCountry();
+		int totalTests = 0;
+		int totalCases = 0;
+		for(CountryData country : all) {
+			Integer tests = country.getTests();
+			totalTests += tests;
+			
+			Integer cases = country.getCases();
+			totalCases += cases;
+		}
+		int testsNonCases = totalTests - totalCases;
+		model.addAttribute("totalTests", totalTests);
+		model.addAttribute("testedNonCase", testsNonCases);
 		return "global"; 
 	}
 		
@@ -90,6 +112,10 @@ public class GraphDataController {
 		List<CountryData> north_america =countryDataRepository.findByContinent("North America");
 		List<CountryData> south_america =countryDataRepository.findByContinent("South America");
 			
+		//extract update time from GWT
+		CountryData UK_data = countryDataRepository.findByCountry("UK");	
+		model.addAttribute("UpdatedAt", df.format(UK_data.getDate()));
+		
 		//create a Map of country and data for Europe
 		Map<String, Integer> casesEU = new HashMap<String, Integer>();
 		
@@ -289,12 +315,14 @@ public class GraphDataController {
 		
 		return "continent"; 
 	}
-//	
-//	@GetMapping("/Countries/{code}") //search function user input specific country code
-//	public String countrySnapshot(Model model) {
-//		model.addAttribute("countries", countryUpdatesRepository.findByCode("userinput"));
-//		//countrytimeline comes also;
-//		return null;
-//	
-//	}
+	
+	@GetMapping("/countries") //All countries stats
+	public String countrySnapshot(Model model) {
+		//extract GWT time of updating
+		CountryUpdates country = countryUpdatesRepository.findByName("UK");
+		model.addAttribute("UpdatedAt", df.format(country.getUpdated_at()));
+		//get updates from all countries
+		model.addAttribute("countries", countryUpdatesRepository.findByOrderByName());
+		return "countries";
+	}
 }
