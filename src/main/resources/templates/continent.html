@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html  xmlns:th="https://www.thymeleafe.org">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>COVID-19</title>
+	<script src="https://kit.fontawesome.com/0fa32f6844.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://code.highcharts.com/css/highcharts.css" />
+	<link rel="stylesheet" type="text/css" href="css/some_style.css"/>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/highcharts-more.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+	<script src="https://code.highcharts.com/modules/export-data.js"></script>
+	<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+</head>
+<body>
+	<div class = "container-fluid">
+		<nav class="navbar navbar-expand-sm navbar-light justify-content-between" style="background-color: #e3f2fd;">
+	         <div class="collapse navbar-collapse" id="navbarNav">
+	              <ul class="nav navbar-nav">
+	                   <li class="nav-item active">
+	                         <a th:href="@{/global}"  class="nav-link">Global</a>
+	                    </li> 
+	                     <li class="nav-item active">
+	                         <a th:href="@{/continent}"  class="nav-link">Continent</a>
+	                    </li>   
+	                     <li class="nav-item active">
+	                         <a th:href="@{/countries}"  class="nav-link">Countries</a>
+	                    </li>        			  				            			  				     
+	                	</ul>
+	                </div>
+	                <form th:action="@{/search}" class="form-inline  ml-auto">
+			   			<input type="text" placeholder="Search ..." th:name="input">
+						<button type="submit"><i class="fa fa-search"></i></button>
+					</form>       
+            </nav>
+
+			<div class="row" style="margin-bottom:10px">
+				<div class="col-md-6" style="margin-top:20px">		
+		        		<div id="continent-bubble" style="width:100%; height:100%;"></div>    
+		    	</div>  	
+		    	<div class="col-md-6" style="margin-top:20px">  
+		    		<div class="row">		
+		        		<div id="continent-bar" style="width:100%; height:360px;"></div>
+						<div id="continent-tests" style="width:100%; height:360px;"></div>     		    	
+		    		</div>
+		    	</div> 	
+		    </div>
+			 <p class="content" th:inline="text" style ="font-style: italic">
+				* Data Source: <a href="https://corona.lmao.ninja">The NovelCOVID API</a><br>
+				* Updated at:  [[${UpdatedAt}]]
+			</p>		    		    	  		
+	</div>
+ 	
+ 	<!-- testing data from backend to Js -->
+	<!--script th:inline="javascript">
+	var europe = /*[[${europeList.keySet()}]]*/[];
+	alert(europe);
+	var albania = /*[[${europeList.get('Albania')}]]*/[];
+	alert(albania);
+	</script-->  
+	  
+	  
+    <script type = "text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    $(function () {        	
+       	 Highcharts.chart('continent-bubble', {
+   		    chart: {
+   		        type: 'packedbubble',
+   		        height: '100%',
+   		    },
+   		    title: {
+   		    	text: 'Continents and Countries (cases > 100)',
+   		    },
+   		   	tooltip: {
+   			    useHTML: true,
+   			    pointFormat: '<b>{point.name}:</b> {point.value}'
+   			},
+   			credits: false,
+			plotOptions: {
+			    packedbubble: {    			     
+			    	minSize: '45%',
+			        maxSize: '450%',
+			        useSimulation: true,
+			      	layoutAlgorithm: {
+			        	splitSeries: false,
+			        	gravitationalConstant: 0.02,
+			        	parentNodeLimit: true
+			       },
+			      dataLabels: {
+			        enabled: true,
+			       	format: '{point.name}',
+			        style: {
+			          color: 'black',
+			          textOutline: 'none',
+			          fontWeight: 'normal'
+			        }
+			      }		    
+			    }   				
+			  },
+   			series: [{
+   			    name: 'Europe',
+   			    data: [
+     			   	{
+       			      name: "Albania",
+       			      value: /*[[${europeList.get('Albania')}]]*/ []
+       			    },
+       			    {
+       			      name: "Andora",
+       			      value: /*[[${europeList.get('Andora')}]]*/ []
+       			    },
+       				{
+       			      name: "Austria",
+       			      value: /*[[${europeList.get('Austria')}]]*/ []
+       			    },
+       				{
+       			      name: "Belarus",
+       			      value: /*[[${europeList.get('Belarus')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Belgium",
+       			      value: /*[[${europeList.get('Belgium')}]]*/ []
+       			    },
+       				{
+       			      name: "Bosnia",
+       			      value: /*[[${europeList.get('Bosnia')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Bulgaria",
+       			      value: /*[[${europeList.get('Bulgaria')}]]*/ []
+       			    },
+       			 	{
+       			      name: 'Channel Island',
+       			      value: /*[[${europeList.get('Channel Islands')}]]*/ []
+       			    },    	
+     			    {
+     			      name: 'Croatia',
+     			      value: /*[[${europeList.get('Croatia')}]]*/ []
+     			    },    			   
+     			    {
+     			      name: "Czech",
+     			      value:  /*[[${europeList.get('Czechia')}]]*/ []
+     			    },
+     			   	{
+       			      name: "Denmark",
+       			      value: /*[[${europeList.get('Denmark')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Estonia",
+       			      value: /*[[${europeList.get('Estonia')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Finland",
+       			      value: /*[[${europeList.get('Finland')}]]*/ []
+       			    },
+       			 	{
+       			      name: "France",
+       			      value: /*[[${europeList.get('France')}]]*/ []
+       			    },
+       			 	{
+       			      name: 'Germany',
+       			      value: /*[[${europeList.get('Germany')}]]*/ [],
+       			    }, 
+       			 	{
+       			      name: "Greece",
+       			      value: /*[[${europeList.get('Greece')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Hungary",
+       			      value: /*[[${europeList.get('Hungary')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Iceland",
+       			      value: /*[[${europeList.get('Iceland')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Ireland",
+       			      value: /*[[${europeList.get('Ireland')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Italy",
+       			      value: /*[[${europeList.get('Italy')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Latvia",
+       			      value: /*[[${europeList.get('Latvia')}]]*/ []
+  	     			},
+  	     			{
+       			      name: "Lithuania",
+       			      value: /*[[${europeList.get('Lithuania')}]]*/ []
+       			    },
+       			    {
+       			      name: "Luxembourg",
+       			      value: /*[[${europeList.get('Luxembourg')}]]*/ []
+       			    },      			 	
+       			 	{
+       			      name: "Macedonia",
+       			      value: /*[[${europeList.get('Macedonia')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Malta",
+       			      value: /*[[${europeList.get('Malta')}]]*/ []
+       			    },
+       			    {
+       			      name: "Moldova",
+       			      value: /*[[${europeList.get('Moldova')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Montenegro",
+       			      value: /*[[${europeList.get('	Montenegro')}]]*/ []
+       			    },
+     			    {
+     			      name: "Netherlands",
+     			      value: /*[[${europeList.get('Netherlands')}]]*/ []
+     			    },
+     			   	{
+       			      name: "Norway",
+       			      value: /*[[${europeList.get('Norway')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Poland",
+       			      value: /*[[${europeList.get('Poland')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Portugal",
+       			      value: /*[[${europeList.get('Portugal')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Romania",
+       			      value: /*[[${europeList.get('Romania')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Russia",
+       			      value: /*[[${europeList.get('Russia')}]]*/ []
+       			    },
+       			 	{
+       			      name: "San Marino",
+       			      value: /*[[${europeList.get('San Marino')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Serbia",
+       			      value: /*[[${europeList.get('Serbia')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Slovakia",
+       			      value: /*[[${europeList.get('Slovakia')}]]*/ []
+       			    },
+       			    {
+       			      name: "Slovenia",
+       			      value: /*[[${europeList.get('Slovenia')}]]*/ []
+       			    },
+     			    {
+     			      name: "Spain",
+     			      value: /*[[${europeList.get('Spain')}]]*/ []
+     			    },
+     			   	{
+       			      name: "Sweden",
+       			      value: /*[[${europeList.get('Sweden')}]]*/ []
+       			    },      			   
+       			    {
+       			      name: "Switzerland",
+       			      value: /*[[${europeList.get('Switzerland')}]]*/ []
+       			    },			        			    
+     			    {
+     			      name: "UK",
+     			      value: /*[[${europeList.get('UK')}]]*/ []
+     			    },
+     			   	{
+       			      name: "Ukraine",
+       			      value: /*[[${europeList.get('Ukraine')}]]*/ []
+       			    },    
+     			   	]}, 
+   			   {
+	       		name: 'Africa',
+		    	data: [
+   			    		{
+  	    			      name: "Algeria",
+  	    			      value:  /*[[${africaList.get('Algeria')}]]*/ []
+  	    			 	},
+  	    			 	{
+   	    			      name: "Burkina Faso",
+   	    			      value:  /*[[${africaList.get('Burkina Faso')}]]*/ []
+   			 			},
+  	    			 	{
+  	      			      name: "CabVerte",
+  	      			      value: /*[[${africaList.get('Cabo Verde')}]]*/ []
+  	      			 	},
+  	      			 	{
+  	       			      name: "Cameroon",
+  	       			      value: /*[[${africaList.get('Cameroon')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Congo",
+  	       			      value: /*[[${africaList.get('Congo')}]]*/[]
+  	       			    },
+  	       				{
+  	       			      name: "Ivory Coast",
+  	       			      value: /*[[${africaList.get("Côte d'Ivoire")}]]*/[]
+  	       			    },
+  	       				{
+   	       			      name: "DRC",
+   	       			      value: /*[[${africaList.get('DRC')}]]*/[]
+   	       			    },
+  	       				{
+  	       			      name: "Djibouti",
+  	       			      value: /*[[${africaList.get('Djibouti')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Egypt",
+  	       			      value:  /*[[${africaList.get('Egypt')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "EquatorGuinea",
+  	       			      value:  /*[[${africaList.get('Equatorial Guinea')}]]*/[]
+  	       			    },
+  	       				{
+   	       			      name: "Ethiopia",
+   	       			      value:  /*[[${africaList.get('Ethiopia')}]]*/[]
+   	       			    },
+  	       			 	{
+  	       			      name: "Gabon",
+  	       			      value:  /*[[${africaList.get('Gabon')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Ghana",
+  	       			      value:  /*[[${africaList.get('Ghana')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Guinea",
+  	       			      value:  /*[[${africaList.get('Guinea')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Guinea-Bissau",
+  	       			      value:  /*[[${africaList.get('Guinea-Bissau')}]]*/[]
+  	       			    },  			    	
+  	     			    {
+  	     			      name: "Kenya",
+  	     			      value:  /*[[${africaList.get('Kenya')}]]*/[]
+  	     			    },
+  	     			 	{
+   	     			      name: "Liberia",
+   	     			      value:  /*[[${africaList.get('Liberia')}]]*/[]
+   	     				},
+   	     				{
+   	       			      name: "Madagascar",
+   	       			      value:  /*[[${africaList.get('Madagascar')}]]*/[]
+   	       			   	},
+  	     			   	{
+  	       			      name: "Mali",
+  	       			      value:  /*[[${africaList.get('Mali')}]]*/[]
+  	       			    },
+  	       				{
+   	       			      name: "Mauritius",
+   	       			      value:  /*[[${africaList.get('Mauritius')}]]*/[]
+   	       			   	},
+  	       			 	{
+  	       			      name: "Mayotte",
+  	       			      value:  /*[[${africaList.get('Mayotte')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Morocco",
+  	       			      value: /*[[${africaList.get('Morocco')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Niger",
+  	       			      value:  /*[[${africaList.get('Niger')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Nigeria",
+  	       			      value:  /*[[${africaList.get('Nigeria')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Rwanda",
+  	       			      value:  /*[[${africaList.get('Rwanda')}]]*/[]
+  	       			    },
+  	       			 	{
+  	       			      name: "Réunion",
+  	       			      value:  /*[[${africaList.get("Réunion")}]]*/[]
+  	       			    },
+  	       			 	{
+         			      name: "Senegal",
+         			      value: /*[[${africaList.get('Senegal')}]]*/ []
+  	         			},
+  	         			{
+       			      	  name: "Sierra Leone",
+       			      	  value: /*[[${africaList.get('Sierra Leone')}]]*/ []
+  	       			    },
+  	       			   	{
+           			      name: "Somali",
+           			      value: /*[[${africaList.get('Somali')}]]*/ []
+  	           			},	 
+  	           			{
+             			  name: "South Africa",
+             			  value: /*[[${africaList.get('South Africa')}]]*/ []
+  	             		}, 
+  	                    {
+  	     			      name: "Sudan",
+  	     			      value: /*[[${africaList.get('Sudan')}]]*/ []
+  	     			    },
+  	     			   	{
+  	       			      name: "Tanzania",
+  	       			      value: /*[[${africaList.get('Tanzania')}]]*/ []
+  	       			    },
+  	       				{
+   	       			      name: "Togo",
+   	       			      value: /*[[${africaList.get('Togo')}]]*/ []
+   	       			    },
+  	     			    {
+  	     			      name: "Tunisia",
+  	     			      value: /*[[${africaList.get('Tunisia')}]]*/ []
+  	     			    },
+  	     			 	{
+   	       			      name: "Zambia",
+   	       			      value: /*[[${africaList.get('Zambia')}]]*/ []
+  	       			    },]
+     			     }, 		   	
+     			{
+   			    name: 'Oceania',
+   			    data: [{
+     			      name: "Australia",
+     			      value: /*[[${oceaniaList.get('Australia')}]]*/ []
+     			    },
+     			    {
+     			      name: "New Zealand",
+     			      value:  /*[[${oceaniaList.get('New Zealand')}]]*/ []
+     			    }]
+     			}, 
+     		{
+     		name: 'North America',
+     		data: [{
+    			      name: "Canada",
+    			      value: /*[[${northAmericaList.get('Canada')}]]*/ []
+    			    },
+    			    {
+       			      name: "Costa Rica",
+       			      value: /*[[${northAmericaList.get('Costa Rica')}]]*/ []
+       			    },
+    			    {
+       			      name: "Cuba",
+       			      value: /*[[${northAmericaList.get('Cuba')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Bermuda",
+       			      value: /*[[${northAmericaList.get('Bermuda')}]]*/ []
+       			    },
+       			 	{
+       			      name: "Dominican",
+       			      value: /*[[${northAmericaList.get('Dominican Republic')}]]*/ []
+       			    },
+       			 	{
+         			   name: "El Salvador",
+         			   value: /*[[${northAmericaList.get('El Salvador')}]]*/ []
+         			},
+         			{
+       			      name: "Guadeloupe",
+       			      value: /*[[${northAmericaList.get('Guadeloupe')}]]*/ []
+       			    },
+         			{
+       			      name: "Guatemala",
+       			      value: /*[[${northAmericaList.get('Guatemala')}]]*/ []
+       			    },
+     			    {
+     			      name: "Honduras",
+     			      value: /*[[${northAmericaList.get('Hondura')}]]*/ []
+     			    },
+     			    {
+     			      name: "Jamaica",
+     			      value: /*[[${northAmericaList.get('Jamaica')}]]*/ []
+     			    },
+     			   	{
+       			      name: "Martinique",
+       			      value: /*[[${northAmericaList.get('Martinique')}]]*/ []
+       			   	},
+       			 	{
+       			      name: "Mexico",
+       			      value: /*[[${northAmericaList.get('Mexico')}]]*/ []
+         			},
+     			    {
+     			      name: "Panama",
+     			      value: /*[[${northAmericaList.get('Panama')}]]*/ []
+     			    },
+     			   	{
+       			      name: "Tobago",
+       			      value: /*[[${northAmericaList.get('Trinidad and Tobago')}]]*/ []
+       			    },
+       			    {
+     			      name: "USA",
+     			      value: /*[[${northAmericaList.get('USA')}]]*/ []
+     			    }]
+   			  	}, {
+   			    name: 'South America',
+   			    data: [
+   			     	{
+   			     	  name: "Argentina",
+   			      	  value: /*[[${southAmericaList.get('Argentina')}]]*/[]
+   			    	},
+   			     	{
+      			      name: "Bolivia",
+      			      value: /*[[${southAmericaList.get('Bolivia')}]]*/[]
+      			    },
+      			  	{
+      			      name: "Brazil",
+      			      value: /*[[${southAmericaList.get('Brazil')}]]*/[]
+      			    },
+      			  	{
+      			      name: "Chile",
+      			      value: /*[[${southAmericaList.get('Chile')}]]*/[]
+      			    },
+      			  	{
+      			      name: "Colombia",
+      			      value: /*[[${southAmericaList.get('Colombia')}]]*/[]
+      			    },
+    			    {
+      			      name: "Ecuador",
+      			      value: /*[[${southAmericaList.get('Ecuador')}]]*/[]
+      			    },
+      			  	{
+        			  name: "Fr.Guiana",
+        			  value: /*[[${southAmericaList.get('French Guiana')}]]*/[]
+        			},
+      			  	{
+      			      name: "Paraguay",
+      			      value: /*[[${southAmericaList.get('Paraguay')}]]*/[]
+      			    },
+      			  	{
+      			      name: "Peru",
+      			      value: /*[[${southAmericaList.get('Peru')}]]*/[]
+      			    },
+    			    {
+    			      name: "Uruguay",
+    			      value: /*[[${southAmericaList.get('Uruguay')}]]*/[]
+    			    },
+    			    {
+    			      name: "Venezuela",
+    			      value: /*[[${southAmericaList.get('Venezuela')}]]*/[]
+    			    }]
+   			  	}, 
+ 			  	{
+ 			    name: 'Asia',
+ 			    data: [
+ 			    	{
+ 		   			  name: "Afghanistan",
+ 		   			  value:  /*[[${asiaList.get('Afghanistan')}]]*/[]
+ 		   			},
+ 		   			{
+ 	 		   		  name: "Armenia",
+ 	 		   		  value:  /*[[${asiaList.get('Armenia')}]]*/[]
+ 	 		   		},
+ 		   			{
+ 		   			  name: "Azerbaijan",
+ 		   			  value:  /*[[${asiaList.get('"Azerbaijan')}]]*/[]
+ 		   			},
+	   			    {
+	   			      name: "Bahrain",
+	   			      value:  /*[[${asiaList.get('Bahrain')}]]*/[]
+ 		   			},
+ 		   			{
+	   			      name: "Bangladesh",
+	   			      value:  /*[[${asiaList.get('Bangladesh')}]]*/[]
+ 	 		   		},
+ 	 		   		{
+ 		   			  name: "Brunei",
+	   			      value:  /*[[${asiaList.get('Brunei')}]]*/[]
+ 	 	 		   	},
+ 	 		   		{
+	   			      name: "Cambodia",
+	   			      value:  /*[[${asiaList.get('Cambodia')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "China",
+	   			      value:  /*[[${asiaList.get('China')}]]*/[]
+	   			    },
+ 	 		   		{
+ 		   			   name: "Georgia",
+ 		   			   value:  /*[[${asiaList.get('Georgia')}]]*/[]
+ 		   			},
+ 		   			{
+	   			      name: "Hong Kong",
+	   			      value:  /*[[${asiaList.get('Hong Kong')}]]*/[]
+ 		   			},
+ 		   			{
+	   			      name: "India",
+	   			      value:  /*[[${asiaList.get('India')}]]*/[]
+ 		   			},
+ 		   			{
+	   			      name: "Indonesia",
+	   			      value:  /*[[${asiaList.get('Indonesia')}]]*/[]
+ 		   			},
+   			    	{
+	   			      name: "Iran",
+	   			      value:  /*[[${asiaList.get('Afghanistan')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Iraq",
+	   			      value:  /*[[${asiaList.get('Iran')}]]*/[]
+		   			},
+		   			{
+	   			      name: "Israel",
+	   			      value:  /*[[${asiaList.get('Iraq')}]]*/[]
+		   			},
+		   			{
+	   			      name: "Japan",
+	   			      value:  /*[[${asiaList.get('Japan')}]]*/[]
+		   			},
+		   			{
+	   			      name: "Jordan",
+	   			      value:  /*[[${asiaList.get('Jordan')}]]*/[]
+		   			},
+		   			{
+	   			      name: "Kazakhstan",
+	   			      value:  /*[[${asiaList.get('Kazakhstan')}]]*/[]
+		   			},
+	   			    {
+	   			      name: "Kyrgyzstan",
+	   			      value:  /*[[${asiaList.get('Kyrgyzstan')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Korea",
+	   			      value:  /*[[${asiaList.get('Korea')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Kuwait",
+	   			      value:  /*[[${asiaList.get('Kuwait')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Lebanon",
+	   			      value: /*[[${asiaList.get('Lebanon')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Malaysia",
+	   			      value: /*[[${asiaList.get('Malaysia')}]]*/[]
+	   			    },
+	   			    {
+	   			      name: "Maldives",
+	   			      value: /*[[${asiaList.get('Maldives')}]]*/[]
+	   			    },
+	   			    {
+	   			      name: "Myanmar",
+	   			      value: /*[[${asiaList.get('Myanmar')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Oman",
+	   			      value: /*[[${asiaList.get('Oman')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Pakistan",
+	   			      value: /*[[${asiaList.get('Pakistan')}]]*/[]
+	   			    },
+		   			{
+	   			      name: "Palestine",
+	   			      value: /*[[${asiaList.get('Palestine')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Philippines",
+	   			      value: /*[[${asiaList.get('Philippines')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Qatar",
+	   			      value: /*[[${asiaList.get('Qatar')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Saudi Arabia",
+	   			      value: /*[[${asiaList.get('Saudi Arabia')}]]*/[]
+		   			},
+	   			    {
+	   			      name: "Singapore",
+	   			      value: /*[[${asiaList.get('Singapore')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Sri Lanka",
+	   			      value: /*[[${asiaList.get('Sri Lanka')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Taiwan",
+	   			      value: /*[[${asiaList.get('Taiwan')}]]*/[]
+			   		},
+			   		{
+	   			      name: "Thailand",
+	   			      value: /*[[${asiaList.get('Thailand')}]]*/[]
+			   		},
+		   			{
+	   			      name: "Turkey",
+	   			      value: /*[[${asiaList.get('Turkey')}]]*/[]
+			   		},
+			   		{
+	   			      name: "UAE",
+	   			      value: /*[[${asiaList.get('UAE')}]]*/[]
+	   			    },	   			   
+	   			    {
+	   			      name: "Uzbekistan",
+	   			      value: /*[[${asiaList.get('Uzbekistan')}]]*/[]
+	   			    },
+	   			 	{
+	   			      name: "Vietnam",
+	   			      value: /*[[${asiaList.get('Vietnam')}]]*/[]
+	   			    },
+	   			    
+	   			    ]
+   			  	}]
+     		});
+        })
+        /*]]>*/	
+    </script>
+    
+    <script th:inline="javascript">
+	/*<![CDATA[*/
+	$(function () {
+		Highcharts.chart('continent-bar', {
+		  chart: {
+		    type: 'bar'
+		  },
+		  title: {
+		    text:  'Continents Categorised Cases'
+		  },
+		  xAxis: {
+		    categories: ['Europe', 'Asia', 'Africa', 'Oceania', 'North America', 'South America'],
+		  },
+		  yAxis: {
+		    min: 0,
+		    title: 'Cases',
+		  	labels: {
+		  	      overflow: 'justify',
+		  	  }
+		   },
+		   credits: false,
+		   plotOptions: {
+		        bar: {
+		          dataLabels: {
+		            enabled: true
+		          }
+		        }
+		     },
+		    legend: {
+		    	    layout: 'vertical',
+		    	    align: 'right',
+		    	    verticalAlign: 'top',
+		    	    x: -40,
+		    	    y: 80,
+		    	    floating: true,
+		    	    borderWidth: 1,
+		    	    backgroundColor:
+		    	      Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF',
+		    	    shadow: true
+		     },  
+			 series: [{
+    				name: 'active',
+    		     	data: 	/*[[${active}]]*/ [],
+    				
+    		 	}, {
+    		     	name: 'deaths',
+    		      	data: 	/*[[${deaths}]]*/ [],
+    		      
+    		  	}, {
+    		      	name: 'recovered',
+    		      	data:  /*[[${recovered}]]*/[],
+    		  	}]
+			});
+	})
+	/*]]>*/
+	</script> 
+	
+	 <script th:inline="javascript">
+	/*<![CDATA[*/
+	$(function () {
+		Highcharts.chart('continent-tests', {
+		  chart: {
+		    type: 'bar'
+		  },
+		  title: {
+		    text:  'Continents Total Tests'
+		  },
+		  xAxis: {
+		    categories: ['Europe', 'Asia', 'Africa', 'Oceania', 'North America', 'South America'],
+		  },
+		  yAxis: {
+		    min: 0,
+		    title: 'Cases',
+		  	labels: {
+		  	      overflow: 'justify',
+		  	  }
+		   },
+		   credits: false,
+		   plotOptions: {
+		        bar: {
+		          dataLabels: {
+		            enabled: true
+		          },
+		   		  color:  '#8bbc21',
+		        }
+		     },  
+			 series: [{
+    				name: 'tested',
+    		     	data: 	/*[[${tested}]]*/ [],  				
+    		 	}]
+			});
+	})
+	/*]]>*/
+	</script>     
+</body>
+</html>

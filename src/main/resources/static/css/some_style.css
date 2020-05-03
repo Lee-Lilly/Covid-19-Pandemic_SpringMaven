@@ -1,0 +1,24 @@
+.content {
+	max-width: 500px;
+  	margin: auto;
+}    
+
+/*table*/
+th {
+	background-color: aliceblue;
+}
+tr:nth-child(even){background-color: #f2f2f2;}
+tr:hover {background-color: #ddd;}
+th, td, p, input {font:14px Verdana;}
+table, th, td 
+        {
+            border: solid 1px #DDD;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+            width :100%;
+        }
+th {font-weight:bold;}
+table {
+	 height: 790px
+}
