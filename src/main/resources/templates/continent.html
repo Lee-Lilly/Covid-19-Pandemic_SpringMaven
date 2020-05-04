@@ -29,11 +29,7 @@
 	                         <a th:href="@{/countries}"  class="nav-link">Countries</a>
 	                    </li>        			  				            			  				     
 	                	</ul>
-	                </div>
-	                <form th:action="@{/search}" class="form-inline  ml-auto">
-			   			<input type="text" placeholder="Search ..." th:name="input">
-						<button type="submit"><i class="fa fa-search"></i></button>
-					</form>       
+	                </div>      
             </nav>
 
 			<div class="row" style="margin-bottom:10px">
@@ -711,7 +707,7 @@
 		    type: 'bar'
 		  },
 		  title: {
-		    text:  'Continents Categorised Cases'
+		    text:  'Continents All Cases'
 		  },
 		  xAxis: {
 		    categories: ['Europe', 'Asia', 'Africa', 'Oceania', 'North America', 'South America'],

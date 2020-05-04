@@ -30,12 +30,18 @@
 	                    </li>        			  				            			  				     
                 	</ul>
                 </div>
-               <form th:action="@{/search}" class="form-inline  ml-auto">
-			   			<input type="text" placeholder="Search ..." th:name="input">
-						<button type="submit"><i class="fa fa-search"></i></button>
-				</form>       
-         </nav>
+               <form th:action="@{/countries}" method="get" class="form-inline  ml-auto">			
+					<label>Table Filter</label>&nbsp;&nbsp;
+			 		<input id = "txtsearch" type="text" th:placeholder="search..." th:name="keyword">
+			 		<button type="submit" ><i class="fa fa-search"></i></button>  						
+				</form>         
+         </nav>      
+        <div th:if="${message}" class="alert alert-warning alert-dismissible fade show" aria-label="Close">
+	        					<button class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+	        					<span th:text="${message}" style = "font-weight: bold"></span>
+	    </div>    
 		<table class= "table text-center table-responsive" id="countries">
+		  
 	    	<thead>
 				<tr>
 					<th class="text-center">Country</th>
@@ -45,6 +51,7 @@
 				    <th class="text-center">Total Recovered</th>
 				    <th class="text-center">Death Rate</th>
 				    <th class="text-center">Recovery Rate</th>
+				    <th class="text-center">Cases Per Million</th>
 				    <th class="text-center">Death today</th>
 				    <th class="text-center">Today Confirmed</th>
 				</tr>
@@ -72,6 +79,9 @@
 		 			<td> 
 		 				<span th:text="${country.getLatest_data().getCalculated().getRecovery_rate()}" th:style="${country.getLatest_data().getCalculated().getRecovery_rate() gt 25}? 'color: blue' : 'color: green'"></span>
 		 			</td>
+		 			<td>
+		    			<span th:text="${country.getLatest_data().getCalculated().getCases_per_million_population()}" th:style="${country.getLatest_data().getCalculated().getCases_per_million_population() gt 100}? 'color: red' : 'color: green'"></span>
+		    		 </td>
 		 			<td>
 						 <span th:text="${country.getToday().getDeaths()}" th:style="${country.getToday().getDeaths() gt 10}? 'color: red' : 'color: green'"></span>		 			
 		 			</td> 

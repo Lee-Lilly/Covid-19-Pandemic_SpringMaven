@@ -18,10 +18,12 @@ public class CountryUpdates {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	@Column(unique = true, name = "country")
+	@Column(name = "country")
 	private String name;
 	
+	@Column(unique = true)
 	private String code;
+	
 	private Integer population;
 	private Date updated_at;
 	

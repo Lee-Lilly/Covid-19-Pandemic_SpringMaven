@@ -13,9 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.project.pandemic.domain.CountryData;
 import com.project.pandemic.domain.CountryDataRepository;
+import com.project.pandemic.domain.CountryTimeline;
+import com.project.pandemic.domain.CountryTimelineWrapper;
 import com.project.pandemic.domain.CountryUpdates;
 import com.project.pandemic.domain.Timeline;
 import com.project.pandemic.domain.CountryUpdatesRepository;
@@ -57,10 +62,10 @@ public class GraphDataController {
 			deathData.add(deaths);
 			recoveredData.add(recovered);
 		}
-		System.out.println(dates);
-		System.out.println(activeData);
-		System.out.println(deathData);
-		System.out.println(recoveredData);
+//		System.out.println(dates);
+//		System.out.println(activeData);
+//		System.out.println(deathData);
+//		System.out.println(recoveredData);
 					
 		model.addAttribute("dates", dates);
 		model.addAttribute("active", activeData);
@@ -76,16 +81,17 @@ public class GraphDataController {
 		Integer recoveredLast = lastLine.getRecovered();
 		Integer confirmed = lastLine.getConfirmed();
 					
-		System.out.println(df.format(latestDate));
-		System.out.println(activeLast);
-		System.out.println(deathsLast);
-		System.out.println(recoveredLast);
+//		System.out.println(df.format(latestDate));
+//		System.out.println(activeLast);
+//		System.out.println(deathsLast);
+//		System.out.println(recoveredLast);
 		
 		model.addAttribute("totalActive", activeLast);
 		model.addAttribute("totalDeaths", deathsLast);
 		model.addAttribute("totalRecovered", recoveredLast);
 		model.addAttribute("latestDate", df.format(latestDate));
 		model.addAttribute("totalConfirmed",confirmed);
+		
 		//Global total amount -tests
 		List<CountryData> all = countryDataRepository.findByOrderByCountry();
 		int totalTests = 0;
@@ -100,6 +106,7 @@ public class GraphDataController {
 		int testsNonCases = totalTests - totalCases;
 		model.addAttribute("totalTests", totalTests);
 		model.addAttribute("testedNonCase", testsNonCases);
+			
 		return "global"; 
 	}
 		
@@ -143,7 +150,7 @@ public class GraphDataController {
 			sumTestsEU += tested;
 		}
 		model.addAttribute("europeList", casesEU);
-		System.out.println(casesEU);
+//		System.out.println(casesEU);
 				
 		//create a Map of country and data for Asia
 		Map<String, Integer> casesAsia = new HashMap<String, Integer>();			
@@ -172,8 +179,7 @@ public class GraphDataController {
 			sumTestsAsia += tested;
 		}		
 		model.addAttribute("asiaList", casesAsia);
-		
-		System.out.println(casesAsia);		
+//		System.out.println(casesAsia);		
 		
 		//create a Map of country and data for Africa
 		Map<String, Integer> casesAfrica = new HashMap<String, Integer>();	
@@ -203,7 +209,7 @@ public class GraphDataController {
 			
 		}	
 		model.addAttribute("africaList", casesAfrica);
-		System.out.println(casesAfrica);
+//		System.out.println(casesAfrica);
 						
 		//create a Map of country and data for Oceania
 		Map<String, Integer> casesOceania = new HashMap<String, Integer>();	
@@ -233,7 +239,7 @@ public class GraphDataController {
 			
 		}	
 		model.addAttribute("oceaniaList", casesOceania);
-		System.out.println(casesOceania);
+//		System.out.println(casesOceania);
 							
 		//create a Map of country and data for North America
 		Map<String, Integer> casesNorthAmerica = new HashMap<String, Integer>();	
@@ -262,7 +268,7 @@ public class GraphDataController {
 			sumTestsNorthAmerica += tested;
 		}
 		model.addAttribute("northAmericaList", casesNorthAmerica);	
-		System.out.println(casesNorthAmerica);
+//		System.out.println(casesNorthAmerica);
 						
 		//create a Map object of country and data for South America
 		Map<String, Integer> casesSouthAmerica = new HashMap<String, Integer>();	
@@ -291,7 +297,7 @@ public class GraphDataController {
 			sumTestsSouthAmerica += tested;
 		}
 		model.addAttribute("southAmericaList", casesSouthAmerica);	
-		System.out.println(casesSouthAmerica);
+//		System.out.println(casesSouthAmerica);
 	
 		List<Integer> activeContinent = Arrays.asList(sumActiveEU, 
 				sumActiveAsia, sumActiveAfrica, sumActiveOceania, 
@@ -317,12 +323,124 @@ public class GraphDataController {
 	}
 	
 	@GetMapping("/countries") //All countries stats
-	public String countrySnapshot(Model model) {
+	public String countrySnapshot(Model model, String keyword) {
 		//extract GWT time of updating
 		CountryUpdates country = countryUpdatesRepository.findByName("UK");
 		model.addAttribute("UpdatedAt", df.format(country.getUpdated_at()));
-		//get updates from all countries
-		model.addAttribute("countries", countryUpdatesRepository.findByOrderByName());
+		
+		//get updates from all countries		
+		if(keyword != null) {
+				model.addAttribute("countries", countryUpdatesRepository.findByKeyword(keyword));
+		}
+		else {		
+			model.addAttribute("countries", countryUpdatesRepository.findByOrderByName());
+		}	
 		return "countries";
 	}
+	
+	 @GetMapping(value = {"/search/{code}"}) //country timeline & totals
+	 public String forceReturn(@PathVariable("code") String code, Model model, RedirectAttributes redirectAttributes) {
+	
+		 	//extract country name from code
+			CountryUpdates country = countryUpdatesRepository.findByCode(code);
+			String name = country.getName();			
+			model.addAttribute("countryName", name + " All Cases");	
+			model.addAttribute("confirmedPerMillion", country.getLatest_data().getCalculated().getCases_per_million_population());
+			
+			int population = country.getPopulation();	
+			System.out.println(population);
+			
+			//extract totals
+			CountryData data = countryDataRepository.findByCountry(name);
+			if (data != null && population > 0) {
+				Date latestDate = data.getDate();
+				Integer activeTotal = data.getActive() ;
+				Integer deathsTotal = data.getDeaths();
+				Integer recoveredTotal = data.getRecovered();
+				Integer confirmedTotal = data.getCases();
+				Integer testsTotal = data.getTests();
+	
+				int testNonCases = testsTotal - confirmedTotal;
+				
+//				System.out.println(df.format(latestDate));
+//				System.out.println(activeTotal);
+//				System.out.println(deathsTotal);
+//				System.out.println(recoveredTotal);
+				System.out.println(testsTotal);
+				
+				model.addAttribute("totalActive", activeTotal);
+				model.addAttribute("totalDeaths", deathsTotal);
+				model.addAttribute("totalRecovered", recoveredTotal);
+				model.addAttribute("latestDate", df.format(latestDate));
+				model.addAttribute("totalConfirmed",confirmedTotal);
+				if(testsTotal > 0) {
+					model.addAttribute("totalTests", "Total Tests: " + testsTotal);
+				}else {
+					model.addAttribute("totalTests", "No tests reported");
+				}
+				
+				model.addAttribute("testedNonCase", testNonCases);					
+				float testsPerMillion = testsTotal/(population/100000);
+				System.out.println(testsPerMillion);
+				model.addAttribute("testsPerMillion", testsPerMillion);
+				
+			}
+			else {
+				CountryUpdates data2 = countryUpdatesRepository.findByName(name);
+				if(data2 != null) {
+					Integer confirmed = data2.getLatest_data().getConfirmed();
+					if (confirmed > 0) {
+						//alert message sent to countries table
+						redirectAttributes.addFlashAttribute("message", "No detailed data for " + name + ". Total Cases: " + confirmed);
+						return "redirect:../countries";						
+					}else {
+						//alert message sends to user session bookstore
+						redirectAttributes.addFlashAttribute("message", "No valid data for: " + name);
+						return "redirect:../countries";						
+					}
+				}
+			}
+		 
+			final String link = "https://corona-api.com/countries/"+ code;
+			 
+			RestTemplate restTemplate = new RestTemplate();
+			 
+			 //fetch country timeline from "ABOUT-CORONA.NET" (https://corona-api.com/countries/{code})
+			CountryTimelineWrapper response3 = restTemplate.getForObject(link, CountryTimelineWrapper.class); 			
+			CountryTimeline value = response3.getData();
+			List<Timeline> timelines = value.getTimeline();		
+			
+			if(timelines.isEmpty() == false) {
+				List<String> dates = new ArrayList<String>();			//initialise a list for dates in String	
+				List<Integer> activeData = new ArrayList<Integer>();	//initialise a list for active			
+				List<Integer> deathData = new ArrayList<Integer>();		//initialise a list for death
+				List<Integer> recoveredData = new ArrayList<Integer>();	//initialise a list for recovered		
+								
+				for(Timeline timeline: timelines) {			
+					Integer deaths = timeline.getDeaths();
+					Integer recovered = timeline.getRecovered();
+					Integer active = timeline.getActive();
+					Date date = timeline.getDate();
+						
+		//			System.out.println(timeline.toString());					
+		
+					dates.add(df_date.format(date)); //prepare the date format for timeline graph
+					activeData.add(active);
+					deathData.add(deaths);
+					recoveredData.add(recovered);
+				}
+				model.addAttribute("dates", dates);
+				model.addAttribute("active", activeData);
+				model.addAttribute("deaths", deathData);
+				model.addAttribute("recovered", recoveredData);
+			}
+			else {
+				System.out.println("There is no timeline indicated for this country.");
+				//alert message sent to country view
+				model.addAttribute("message", "There is no timeline indicated for this country");
+			}
+						
+		return "view"; 	
+	 }
+	 
 }
