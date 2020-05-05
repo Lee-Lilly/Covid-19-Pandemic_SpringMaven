@@ -24,17 +24,14 @@ import com.project.pandemic.domain.CountryTimelineWrapper;
 import com.project.pandemic.domain.CountryUpdates;
 import com.project.pandemic.domain.Timeline;
 import com.project.pandemic.domain.CountryUpdatesRepository;
-import com.project.pandemic.domain.TimelineRepository;
+import com.project.pandemic.domain.TimelineWrapper;
 
 
 @Controller
 public class GraphDataController {
 	@Autowired
 	private CountryDataRepository countryDataRepository;
-	
-	@Autowired
-	private TimelineRepository timelineRepository;
-	
+		
 	@Autowired
 	private CountryUpdatesRepository countryUpdatesRepository;
 	
@@ -43,8 +40,12 @@ public class GraphDataController {
 	
 	@GetMapping({"/", "/global"})
 	public String global(Model model) {
-		//Timeline World-wide
-		List<Timeline> timelines = timelineRepository.findByOrderByDate();
+		//RestTemplate for fetching data
+		RestTemplate restTemplate = new RestTemplate();
+		
+		//fetch global timeline from "ABOUT-CORONA.NET" (https://about-corona.net)
+		TimelineWrapper response1 = restTemplate.getForObject("https://corona-api.com/timeline", TimelineWrapper.class); 
+		List<Timeline> timelines = response1.getData();		
 			
 		List<String> dates = new ArrayList<String>();			//initialise a list for dates in String	
 		List<Integer> activeData = new ArrayList<Integer>();	//initialise a list for active			
@@ -73,8 +74,7 @@ public class GraphDataController {
 		model.addAttribute("recovered", recoveredData);
 		
 		//Global total amount - the latest updates
-		int last = timelines.size() -1;
-		Timeline lastLine = timelines.get(last);
+		Timeline lastLine = timelines.get(0);
 		Date latestDate = lastLine.getDate();
 		Integer activeLast = lastLine.getActive();
 		Integer deathsLast = lastLine.getDeaths();
@@ -346,13 +346,10 @@ public class GraphDataController {
 			String name = country.getName();			
 			model.addAttribute("countryName", name + " All Cases");	
 			model.addAttribute("confirmedPerMillion", country.getLatest_data().getCalculated().getCases_per_million_population());
-			
-			int population = country.getPopulation();	
-			System.out.println(population);
-			
+						
 			//extract totals
 			CountryData data = countryDataRepository.findByCountry(name);
-			if (data != null && population > 0) {
+			if (data != null) {
 				Date latestDate = data.getDate();
 				Integer activeTotal = data.getActive() ;
 				Integer deathsTotal = data.getDeaths();
@@ -366,7 +363,7 @@ public class GraphDataController {
 //				System.out.println(activeTotal);
 //				System.out.println(deathsTotal);
 //				System.out.println(recoveredTotal);
-				System.out.println(testsTotal);
+//				System.out.println("Total tests: "+ testsTotal);
 				
 				model.addAttribute("totalActive", activeTotal);
 				model.addAttribute("totalDeaths", deathsTotal);
@@ -374,16 +371,11 @@ public class GraphDataController {
 				model.addAttribute("latestDate", df.format(latestDate));
 				model.addAttribute("totalConfirmed",confirmedTotal);
 				if(testsTotal > 0) {
-					model.addAttribute("totalTests", "Total Tests: " + testsTotal);
+					model.addAttribute("totalTests", "Total Tests: " + testsTotal);		
+					model.addAttribute("testedNonCase", testNonCases);	
 				}else {
-					model.addAttribute("totalTests", "No tests reported");
-				}
-				
-				model.addAttribute("testedNonCase", testNonCases);					
-				float testsPerMillion = testsTotal/(population/100000);
-				System.out.println(testsPerMillion);
-				model.addAttribute("testsPerMillion", testsPerMillion);
-				
+					model.addAttribute("totalTests", "No tests reported");	
+				}																	
 			}
 			else {
 				CountryUpdates data2 = countryUpdatesRepository.findByName(name);
@@ -440,7 +432,7 @@ public class GraphDataController {
 				model.addAttribute("message", "There is no timeline indicated for this country");
 			}
 						
-		return "view"; 	
+		return "country"; 	
 	 }
 	 
 }

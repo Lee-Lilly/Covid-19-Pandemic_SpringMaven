@@ -3,16 +3,9 @@
 <head>
 	<title>COVID-19</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<script src="https://kit.fontawesome.com/0fa32f6844.js"></script>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://code.highcharts.com/css/highcharts.css" />
 	<link rel="stylesheet" type="text/css" href="css/some_style.css"/>
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
-	<script src="https://code.highcharts.com/highcharts.js"></script>
-	<script src="https://code.highcharts.com/highcharts-more.js"></script>
-	<script src="https://code.highcharts.com/modules/exporting.js"></script>
-	<script src="https://code.highcharts.com/modules/export-data.js"></script>
-	<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script src="/js/jquery-3.5.1.slim.min.js"></script>	
 </head>
 <body>
 	<div class="container-fluid">
@@ -29,19 +22,18 @@
 	                         <a th:href="@{/countries}"  class="nav-link">Countries</a>
 	                    </li>        			  				            			  				     
                 	</ul>
-                </div>
-               <form th:action="@{/countries}" method="get" class="form-inline  ml-auto">			
-					<label>Table Filter</label>&nbsp;&nbsp;
-			 		<input id = "txtsearch" type="text" th:placeholder="search..." th:name="keyword">
-			 		<button type="submit" ><i class="fa fa-search"></i></button>  						
-				</form>         
+                </div>	          		
+			     <form th:action="@{/countries}" method="get" class="form-inline  ml-auto">			
+						<label>Table Filter</label>&nbsp;&nbsp;
+						 <input id = "txtsearch" type="text" th:placeholder="search..." th:name="keyword" style ="font-style: italic; font-size:14px">
+						 <button type="submit"style ="font-size:14px">GO</button>						
+				 </form>	  			       
          </nav>      
         <div th:if="${message}" class="alert alert-warning alert-dismissible fade show" aria-label="Close">
 	        					<button class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 	        					<span th:text="${message}" style = "font-weight: bold"></span>
 	    </div>    
-		<table class= "table text-center table-responsive" id="countries">
-		  
+		<table class="table text-center table-responsive" id="countries">	  
 	    	<thead>
 				<tr>
 					<th class="text-center">Country</th>
@@ -59,42 +51,42 @@
 			<tbody>
 		    	<tr th:each = "country : ${countries}">
 		    		<td>
-		    			<a th:href="@{/search/{code}(code=${country.code})}" th:text="${country.name}" target="_blank"></a>
+		    			<a th:href="@{/search/{code}(code=${country.code})}" th:text="${country.name}"></a>
 		    		</td>
 		    		<td>
-		    			<span th:text="${country.getLatest_data().getConfirmed()}" th:style="${country.getLatest_data().getConfirmed() gt 300}? 'color: red' : 'color: green'"></span>		 			
+		    			<span th:text="${country.latest_data.confirmed}" th:style="${country.latest_data.confirmed gt 300}? 'color: red' : 'color: green'"></span>		 			
 		    		</td>
 		    		<td>
-		    			<span th:text="${country.getLatest_data().getCritical()}" th:style="${country.getLatest_data().getCritical() gt 100}? 'color: red' : 'color: green'"></span>		 			
+		    			<span th:text="${country.latest_data.critical}" th:style="${country.latest_data.critical gt 100}? 'color: red' : 'color: green'"></span>		 			
 		    		 </td>
 		    		<td>
-		    			<span th:text="${country.getLatest_data().getDeaths()}" th:style="${country.getLatest_data().getDeaths() gt 100}? 'color: red' : 'color: green'"></span>		 		
+		    			<span th:text="${country.latest_data.deaths}" th:style="${country.latest_data.deaths gt 100}? 'color: red' : 'color: green'"></span>		 		
 		    		 </td>
 		    		<td>
-		    			<span th:text="${country.getLatest_data().getRecovered()}" th:style="${country.getLatest_data().getRecovered() gt 100}? 'color: blue' : 'color: green'"></span>
+		    			<span th:text="${country.latest_data.recovered}" th:style="${country.latest_data.recovered gt 100}? 'color: green' : 'color: green'"></span>
 		    		 </td>
 		    		<td>
-		    			<span th:text="${country.getLatest_data().getCalculated().getDeath_rate()}" th:style="${country.getLatest_data().getCalculated().getDeath_rate() gt 5.0}? 'color: red' : 'color: green'"></span>
+		    			<span th:text="${country.latest_data.calculated.death_rate}" th:style="${country.latest_data.calculated.death_rate gt 5.0}? 'color: red' : 'color: green'"></span>
 		    		 </td>
 		 			<td> 
-		 				<span th:text="${country.getLatest_data().getCalculated().getRecovery_rate()}" th:style="${country.getLatest_data().getCalculated().getRecovery_rate() gt 25}? 'color: blue' : 'color: green'"></span>
+		 				<span th:text="${country.latest_data.calculated.recovery_rate}" th:style="${country.latest_data.calculated.recovery_rate gt 25}? 'color: green' : 'color: green'"></span>
 		 			</td>
 		 			<td>
-		    			<span th:text="${country.getLatest_data().getCalculated().getCases_per_million_population()}" th:style="${country.getLatest_data().getCalculated().getCases_per_million_population() gt 100}? 'color: red' : 'color: green'"></span>
+		    			<span th:text="${country.latest_data.calculated.cases_per_million_population}" th:style="${country.latest_data.calculated.cases_per_million_population gt 100}? 'color: red' : 'color: green'"></span>
 		    		 </td>
 		 			<td>
-						 <span th:text="${country.getToday().getDeaths()}" th:style="${country.getToday().getDeaths() gt 10}? 'color: red' : 'color: green'"></span>		 			
+						 <span th:text="${country.today.deaths}" th:style="${country.today.deaths gt 10}? 'color: red' : 'color: green'"></span>		 			
 		 			</td> 
 		 			<td>
-						 <span th:text="${country.getToday().getConfirmed()}" th:style="${country.getToday().getConfirmed() gt 100}? 'color: red' : 'color: green'"></span>		 			
+						 <span th:text="${country.today.confirmed}" th:style="${country.today.confirmed gt 100}? 'color: red' : 'color: green'"></span>		 			
 		 			</td> 
 		 		</tr>
 	    	</tbody> 	
 	     </table> 
-	     <p class="content" th:inline="text" style ="font-style: italic">
+	     <p class="content" th:inline="text" style ="font-style: italic; font-size:14px">
 				* Data Source: <a href="https://about-corona.net">ABOUT-CORONA.NET</a><br>
 				* Updated at: [[${UpdatedAt}]]
 		</p>
-	  </div>    
+	  </div>	     
 </body>
 </html>

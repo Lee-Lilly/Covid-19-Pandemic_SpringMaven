@@ -31,7 +31,7 @@ public class PandemicApplication {
 	
 
 	@Bean
-	public CommandLineRunner pandemicApp(RestTemplate restTemplate, CountryDataRepository countryDataRepository, TimelineRepository timelineRepository, CountryUpdatesRepository countryUpdatesRepository) throws Exception {
+	public CommandLineRunner pandemicApp(RestTemplate restTemplate, CountryDataRepository countryDataRepository, CountryUpdatesRepository countryUpdatesRepository) throws Exception {
 		return args -> { 
 			
 			//fetch today's data of all countries through "NOVEL COVID API" (https://corona.lmao.ninja)
@@ -61,24 +61,24 @@ public class PandemicApplication {
 			
 			}
 			
-			//fetch global timeline from "ABOUT-CORONA.NET" (https://about-corona.net)
-			//Data source: "Johns Hopkins CSSE"
-			TimelineWrapper response1 = restTemplate.getForObject("https://corona-api.com/timeline", TimelineWrapper.class); 
-			List<Timeline> timelineList = response1.getData();
-			
-			for(Timeline timeline : timelineList) {
-				
-				Integer confirmed = timeline.getConfirmed();
-				Integer deaths = timeline.getDeaths();
-				Integer recovered = timeline.getRecovered();
-				Integer active = timeline.getActive();
-				Date date = timeline.getDate();
-				
-			//	log.info(timeline.toString());
-			
-				//save to database
-				timelineRepository.save(new Timeline(confirmed, deaths, recovered, active, date));			
-			}
+//			//fetch global timeline from "ABOUT-CORONA.NET" (https://about-corona.net) //to save running time, fetch the online data.
+//			//Data source: "Johns Hopkins CSSE"
+//			TimelineWrapper response1 = restTemplate.getForObject("https://corona-api.com/timeline", TimelineWrapper.class); 
+//			List<Timeline> timelineList = response1.getData();
+//			
+//			for(Timeline timeline : timelineList) {
+//				
+//				Integer confirmed = timeline.getConfirmed();
+//				Integer deaths = timeline.getDeaths();
+//				Integer recovered = timeline.getRecovered();
+//				Integer active = timeline.getActive();
+//				Date date = timeline.getDate();
+//				
+//			//	log.info(timeline.toString());
+//			
+//				//save to database
+//				timelineRepository.save(new Timeline(confirmed, deaths, recovered, active, date));			
+//			}
 			
 			//fetch calculated updates for all countries from "ABOUT-CORONA.NET" (https://about-corona.net)
 			CountryUpdatesWrapper response2 = restTemplate.getForObject("https://corona-api.com/countries", CountryUpdatesWrapper.class);

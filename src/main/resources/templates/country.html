@@ -3,70 +3,54 @@
 <head>
 	<title>Country View</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<script src="https://kit.fontawesome.com/0fa32f6844.js"></script>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://code.highcharts.com/css/highcharts.css" />
+	<link rel="stylesheet" type="text/css" href="css/highcharts.css" />
 	<link rel="stylesheet" type="text/css" href="css/some_style.css"/>
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
-	<script src="https://code.highcharts.com/highcharts.js"></script>
-	<script src="https://code.highcharts.com/highcharts-more.js"></script>
-	<script src="https://code.highcharts.com/modules/exporting.js"></script>
-	<script src="https://code.highcharts.com/modules/export-data.js"></script>
-	<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<script src="/js/jquery-3.5.1.slim.min.js"></script>
+	<script src="/js/highcharts.js"></script>
 </head>
 <body>
 	<div class = "container-fluid">
 		<nav class="navbar navbar-expand-sm navbar-light justify-content-between" style="background-color: #e3f2fd;">
 	         <div class="collapse navbar-collapse" id="navbarNav">
 	               <ul class="nav navbar-nav">
-	                     <li th:classappend="${module == 'global' ? 'active' : ''}">
+	                    <li class="nav-item active">
 	                         <a th:href="@{/global}"  class="nav-link">Global</a>
+	                    </li> 
+	                     <li class="nav-item active">
+	                         <a th:href="@{/continent}"  class="nav-link">Continent</a>
 	                    </li>   
-	                     <li th:classappend="${module == 'continent' ? 'active' : ''}">
-	                         <a th:href="@{/continent}"  class="nav-link">Continents</a>
-	                    </li>  
-	                     <li th:classappend="${module == 'countries' ? 'active' : ''}">
+	                     <li class="nav-item active">
 	                         <a th:href="@{/countries}"  class="nav-link">Countries</a>
-	                    </li>        			  				            			  				     
+	                    </li>        			  				     
 	               	</ul>
-	               	  <ul class="nav navbar-nav-right">
-	               	  	<li>
-	               	  	  
-	               	  	</li>
-	               	  </ul>
 	         </div>
 	    </nav>
-          
+   	       
 		<div class="row" style="margin-bottom:10px">
 			<div class="col-md-6" style="margin-top:20px">		
-			        <div id="global-pie" style="width:100%; height:360px;"></div> 
-			        	<div th:inline="text" th:align="center" ><strong>Total Confirmed: [[${totalConfirmed}]]</strong> </div>  
-			        	<div th:inline="text" th:align="center" >Confirmed Per Million: [[${confirmedPerMillion}]]</div>	  			
+			        <div id="cases-pie" style="width:100%; height:300px;"></div> 
+			        <p th:inline="text" th:align="center"><strong>Total Confirmed: [[${totalConfirmed}]]</strong><br>Confirmed Per Million: [[${confirmedPerMillion}]]</p>	  			
 		  	</div>  	
 	    	<div class="col-md-6" style="margin-top:20px">  	
-	       		<div id="global-pie-tests" style="width:100%; height:360px;"></div>
-	       		<div th:inline="text" th:align="center" ><strong> [[${totalTests}]]</strong> </div>
-	       		<div th:inline="text" th:align="center" >Tests Per Million: [[${testsPerMillion}]]</div>	  			
+	       		<div id="tests-pie" style="width:100%; height:345px;"></div>
+	       		<p th:inline="text" th:align="center" ><strong> [[${totalTests}]]</strong></p>	  			
 		  	</div>  		
-	   		</div>
 		</div>    	 
 		<div class="row" style="margin-bottom:5px">
 			<div class="col-md-12" style="margin-top:5px">
-			<div th:if="${message}" class="alert alert-warning alert-dismissible fade show" aria-label="Close">
+					<div th:if="${message}" class="alert alert-warning alert-dismissible fade show" aria-label="Close">
 	        					<button class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-	        					<span th:text="${message}" style = "font-weight: bold"></span>
-	    	</div> 		
-				<div id ="global-timeline" style="width:100%; height:100%;"></div>				
-			</div>
+	        					<span th:text="${message}" style = "font-weight: bold"></span></div>
+					<div id ="country-timeline" style="width:100%; height:100%;"></div>	
+			</div>								
 	   </div>
-	   
-	   <div th:align="center" th:inline="text" style ="font-style: italic; font-size:14px">
+   
+	   	<div th:align="center" th:inline="text" style ="font-style: italic; font-size:14px">
 			* Data Source: <a href="https://corona.lmao.ninja">The NovelCOVID API</a> and  <a href="https://about-corona.net">ABOUT-CORONA.NET</a><br>
 			* Updated at: [[${latestDate}]]
 		</div>
-	   
-	</div> 
-	
+	</div>
 	<!-- testing data from backend to Js -->	 
    <!--script th:inline="javascript">
 	var active = /*[[${active}]]*/[];
@@ -82,7 +66,7 @@
    <script th:inline="javascript">
 	/*<![CDATA[*/
 	$(function () {
-		Highcharts.chart('global-pie', {
+		Highcharts.chart('cases-pie', {
 			  chart: {
 			    type: 'pie'
 			  },
@@ -125,7 +109,7 @@
 	<script th:inline="javascript">
 	/*<![CDATA[*/
 	$(function () {
-		Highcharts.chart('global-pie-tests', {
+		Highcharts.chart('tests-pie', {
 			  chart: {
 			    type: 'pie'
 			  },
@@ -171,7 +155,7 @@
 	<script th:inline="javascript">
 	/*<![CDATA[*/
 	$(function () {
-		Highcharts.chart('global-timeline', {
+		Highcharts.chart('country-timeline', {
 			chart: {
 			    type: 'area'
 		  	},
