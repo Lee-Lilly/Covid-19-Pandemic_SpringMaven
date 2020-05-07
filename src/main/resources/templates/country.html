@@ -26,8 +26,13 @@
 	               	</ul>
 	         </div>
 	    </nav>
-   	       
-		<div class="row" style="margin-bottom:10px">
+   	      
+   	     <div th:if="${message}" class="alert alert-warning alert-dismissible fade show" aria-label="Close">
+	        			<button class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+	        			<span th:text="${message}" style = "font-weight: bold"></span></div>
+			<div id ="country-timeline" style="width:100%; height:100%;"></div>	
+					  
+		<!-- div class="row" style="margin-bottom:10px">
 			<div class="col-md-6" style="margin-top:20px">		
 			        <div id="cases-pie" style="width:100%; height:300px;"></div> 
 			        <p th:inline="text" th:align="center"><strong>Total Confirmed: [[${totalConfirmed}]]</strong><br>Confirmed Per Million: [[${confirmedPerMillion}]]</p>	  			
@@ -44,139 +49,34 @@
 	        					<span th:text="${message}" style = "font-weight: bold"></span></div>
 					<div id ="country-timeline" style="width:100%; height:100%;"></div>	
 			</div>								
-	   </div>
+	   </div-->
    
 	   	<div th:align="center" th:inline="text" style ="font-style: italic; font-size:14px">
 			* Data Source: <a href="https://corona.lmao.ninja">The NovelCOVID API</a> and  <a href="https://about-corona.net">ABOUT-CORONA.NET</a><br>
 			* Updated at: [[${latestDate}]]
 		</div>
-	</div>
-	<!-- testing data from backend to Js -->	 
-   <!--script th:inline="javascript">
-	var active = /*[[${active}]]*/[];
-	alert(active);
-	var recovered = /*[[${recovered}]]*/[];
-	alert(recovered);
-	var dates = /*[[${dates}]]*/[];
-	alert(dates);	
-	var deaths = /*[[${deaths}]]*/ [];
-	alert(deaths);
-	</script-->
-   
-   <script th:inline="javascript">
-	/*<![CDATA[*/
-	$(function () {
-		Highcharts.chart('cases-pie', {
-			  chart: {
-			    type: 'pie'
-			  },
-			  title: {
-			    text: /*[[${countryName}]]*/[]
-			  },
-			  credits: false,
-	           plotOptions: {
-	                pie: {
-	                    allowPointSelect: true,
-	                    depth: 5,
-	                    dataLabels: {
-	                        enabled: true,
-	                        format: '<b>{point.name}</b>:<br>{point.percentage:.1f} %<br>',
-	                    }
-	                }
-	            },
-			  series: [{
-				name:'total',
-			    colorByPoint: true,
-			    data: [{
-    				name: 'Active',
-    		     	y: 	/*[[${totalActive}]]*/ [],
-    				
-    		 	}, {
-    		     	name: 'Deaths',
-    		      	y: 	/*[[${totalDeaths}]]*/ [],
-    		      
-    		  	}, {
-    		      	name: 'Recovered',
-    		      	y:  /*[[${totalRecovered}]]*/[],
-    		     	      			
-    			}]
-			  }]
-			});
-	})
-	/*]]>*/
-	</script>   	
-	
-	<script th:inline="javascript">
-	/*<![CDATA[*/
-	$(function () {
-		Highcharts.chart('tests-pie', {
-			  chart: {
-			    type: 'pie'
-			  },
-			  title: {
-			    text: "Confirmed vs Total Tests"
-			  },
-			  credits: false,
-	           plotOptions: {
-	                pie: {
-	                    allowPointSelect: true,
-	                    depth: 5,
-	                    dataLabels: {
-	                        enabled: true,
-	                        format: '<b>{point.name}</b>:{point.percentage:.1f} %',
-	                    }
-	                }
-	            },
-			  series: [{
-				name: 'total',
-			  	colorByPoint: true,
-			  	data: [{
-    				name: 'Active',
-    		     	y: 	/*[[${totalActive}]]*/ [],
-    				
-    		 	}, {
-    		     	name: 'Deaths',
-    		      	y: 	/*[[${totalDeaths}]]*/ [],
-    		      
-    		  	}, {
-    		      	name: 'Recovered',
-    		      	y:  /*[[${totalRecovered}]]*/[],
-    		     	      			
-    			},{ name: 'Tested Non-confirmed',
-    		      	y:  /*[[${testedNonCase}]]*/[],
-    		     	      			
-    			}]
-			  }]
-			});
-	})
-	/*]]>*/
-	</script>   	
-	
+	</div>	
+		
 	<script th:inline="javascript">
 	/*<![CDATA[*/
 	$(function () {
 		Highcharts.chart('country-timeline', {
-			chart: {
-			    type: 'area'
-		  	},
 		  	title: {
-			    text: "Timeline"
+			    text: /*[[${countryName}]]*/[]
+		  	},
+		  	subtitle: {
+		  		text: 'Total Confirmed: [[${totalConfirmed}]]' ,
 		  	},
 		  	credits: false,
 		  	xAxis: {
 			     categories: /*[[${dates}]]*/[]
 		 	},
-		 	yAxis: {
-       	        title: {
-	              text: 'Cases'
-       		   	},	 		
-	          },
-	          tooltip: {
-	        	  	split:true,
+	        tooltip: {
+	        	  	split:false,
 	        	    headerFormat: '<b>{point.x}</b><br/>',
-	        	    pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-	        	},	  
-	           plotOptions: {
+	        	    pointFormat: '<b>{point.name}</b> {point.y}'
+	        },	  
+	        plotOptions: {
 	        	   area: {
 	        		      stacking: 'normal',
 	        		      dataLabels: {
@@ -188,17 +88,49 @@
 			               lineWidth: 1,
 			               lineColor: '#666666'
 			             }
-	        		  }
-	            },	          
+	        		  },
+	        		  pie: {
+		                    allowPointSelect: true,
+		                    depth: 5,
+		                    dataLabels: {
+		                        enabled: true,
+		                        format: '<b>{point.name}</b>:{point.percentage:.1f} %',
+		                    },
+		                }
+	          },	          
 			  series: [{
+				  	type: 'area',
     				name: 'Active',
     		     	data: /*[[${active}]]*/ [],		
     		 	}, {
+    		 		type: 'area',
     		     	name: 'Deaths',
     		      	data: /*[[${deaths}]]*/ [],
     		  	}, {
+    		  		type: 'area',
     		      	name: 'Recovered',
     		      	data:  /*[[${recovered}]]*/[],	      			
+    			}, {
+    				type: 'pie',
+    			  	data: [{
+        				name: 'Active',
+        		     	y: 	/*[[${totalActive}]]*/ [],
+        				
+        		 	}, {
+        		     	name: 'Deaths',
+        		      	y: 	/*[[${totalDeaths}]]*/ [],
+        		      
+        		  	}, {
+        		      	name: 'Recovered',
+        		      	y:  /*[[${totalRecovered}]]*/[],
+        		     	      			
+        			}],
+        			center: [100,60],
+        		    size: 100,
+        		    showInLegend: false,
+        		    dataLabels: {
+        		      enabled: true     		      
+        		    }   				
     			}]
 			});
 	})

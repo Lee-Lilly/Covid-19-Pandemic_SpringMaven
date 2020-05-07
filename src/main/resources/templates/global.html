@@ -26,23 +26,8 @@
 	               	</ul>
 	         </div>
 	    </nav>
-            
-		<div class="row" style="margin-bottom:10px">
-			<div class="col-md-6" style="margin-top:20px">		
-			        <div id="global-pie" style="width:100%; height:300px;"></div> 
-			        	<p th:inline="text" th:align="center" ><strong>Total Confirmed: [[${totalConfirmed}]]</strong> </p>  
-			        	<p th:inline="text" th:align="center" ><strong> Total Tests: [[${totalTests}]]</strong> </p> 		  			
-		  	</div>  	
-		  
-	    	<div class="col-md-6" style="margin-top:20px">  	
-	       		<div id="global-pie-tests" style="width:100%; height:360px;"></div>
-	   		</div>
-		</div> 	
-		<div class="row" style="margin-bottom:5px">
-			<div class="col-md-12" style="margin-top:5px">	
-				<div id ="global-timeline" style="width:100%; height:100%;"></div>
-			</div>
-	   </div>
+        
+        <div id ="global-timeline" style="width:100%; height:100%;"></div>    
 	   
 	   <p class="content" th:inline="text" style ="font-style: italic">
 			* Data Source: <a href="https://corona.lmao.ninja">The NovelCOVID API</a> and  <a href="https://about-corona.net">ABOUT-CORONA.NET</a><br>
@@ -50,133 +35,27 @@
 		</p>
 	   
 	</div> 
-	
-	<!-- testing data from backend to Js -->	 
-   <!--script th:inline="javascript">
-	var active = /*[[${active}]]*/[];
-	alert(active);
-	var recovered = /*[[${recovered}]]*/[];
-	alert(recovered);
-	var dates = /*[[${dates}]]*/[];
-	alert(dates);	
-	var deaths = /*[[${deaths}]]*/ [];
-	alert(deaths);
-	</script-->
-   
-   <script th:inline="javascript">
-	/*<![CDATA[*/
-	$(function () {
-		Highcharts.chart('global-pie', {
-			  chart: {
-			    type: 'pie'
-			  },
-			  title: {
-			    text: "Total Cases Worldwide"
-			  },
-			  credits: false,
-	           plotOptions: {
-	                pie: {
-	                    allowPointSelect: true,
-	                    depth: 5,
-	                    dataLabels: {
-	                        enabled: true,
-	                        format: '<b>{point.name}</b>:<br>{point.percentage:.1f} %<br>',
-	                    }
-	                }
-	            },
-			  series: [{
-				name:'total',
-			    colorByPoint: true,
-			    data: [{
-    				name: 'Active',
-    		     	y: 	/*[[${totalActive}]]*/ [],
-    				
-    		 	}, {
-    		     	name: 'Deaths',
-    		      	y: 	/*[[${totalDeaths}]]*/ [],
-    		      
-    		  	}, {
-    		      	name: 'Recovered',
-    		      	y:  /*[[${totalRecovered}]]*/[],
-    		     	      			
-    			}]
-			  }]
-			});
-	})
-	/*]]>*/
-	</script>   	
-	
-	<script th:inline="javascript">
-	/*<![CDATA[*/
-	$(function () {
-		Highcharts.chart('global-pie-tests', {
-			  chart: {
-			    type: 'pie'
-			  },
-			  title: {
-			    text: "Confirmed vs Total Tests"
-			  },
-			  credits: false,
-	           plotOptions: {
-	                pie: {
-	                    allowPointSelect: true,
-	                    depth: 5,
-	                    dataLabels: {
-	                        enabled: true,
-	                        format: '<b>{point.name}</b>:{point.percentage:.1f} %',
-	                    }
-	                }
-	            },
-			  series: [{
-				name: 'total',
-			  	colorByPoint: true,
-			  	data: [{
-    				name: 'Active',
-    		     	y: 	/*[[${totalActive}]]*/ [],
-    				
-    		 	}, {
-    		     	name: 'Deaths',
-    		      	y: 	/*[[${totalDeaths}]]*/ [],
-    		      
-    		  	}, {
-    		      	name: 'Recovered',
-    		      	y:  /*[[${totalRecovered}]]*/[],
-    		     	      			
-    			},{ name: 'Tested Non-confirmed',
-    		      	y:  /*[[${testedNonCase}]]*/[],
-    		     	      			
-    			}]
-			  }]
-			});
-	})
-	/*]]>*/
-	</script>   	
-	
+
 	<script th:inline="javascript">
 	/*<![CDATA[*/
 	$(function () {
 		Highcharts.chart('global-timeline', {
-			chart: {
-			    type: 'area'
-		  	},
 		  	title: {
-			    text: "Worldwide Timeline"
+			    text: "COVID-19 Worldwide"
+		  	},
+		  	subtitle: {
+		  		text: 'Total Confirmed: [[${totalConfirmed}]]' ,
 		  	},
 		  	credits: false,
 		  	xAxis: {
 			     categories: /*[[${dates}]]*/[]
 		 	},
-		 	yAxis: {
-       	        title: {
-	              text: 'Cases'
-       		   	},	 		
-	          },
-	          tooltip: {
-	        	  	split:true,
+	        tooltip: {
+	        	  	split:false,
 	        	    headerFormat: '<b>{point.x}</b><br/>',
-	        	    pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-	        	},	  
-	           plotOptions: {
+	        	    pointFormat: '<b>{point.name}</b> {point.y}'
+	        },	  
+	        plotOptions: {
 	        	   area: {
 	        		      stacking: 'normal',
 	        		      dataLabels: {
@@ -188,17 +67,49 @@
 			               lineWidth: 1,
 			               lineColor: '#666666'
 			             }
-	        		  }
-	            },	          
+	        		  },
+	        		  pie: {
+		                    allowPointSelect: true,
+		                    depth: 5,
+		                    dataLabels: {
+		                        enabled: true,
+		                        format: '<b>{point.name}</b>:{point.percentage:.1f} %',
+		                    }
+		                }
+	          },	          
 			  series: [{
+				  	type: 'area',
     				name: 'Active',
     		     	data: /*[[${active}]]*/ [],		
     		 	}, {
+    		 		type: 'area',
     		     	name: 'Deaths',
     		      	data: /*[[${deaths}]]*/ [],
     		  	}, {
+    		  		type: 'area',
     		      	name: 'Recovered',
     		      	data:  /*[[${recovered}]]*/[],	      			
+    			}, {
+    				type: 'pie',
+    			  	data: [{
+        				name: 'Active',
+        		     	y: 	/*[[${totalActive}]]*/ [],
+        				
+        		 	}, {
+        		     	name: 'Deaths',
+        		      	y: 	/*[[${totalDeaths}]]*/ [],
+        		      
+        		  	}, {
+        		      	name: 'Recovered',
+        		      	y:  /*[[${totalRecovered}]]*/[],
+        		     	      			
+        			}],
+        			center: [120, 60],
+        		    size: 120,
+        		    showInLegend: false,
+        		    dataLabels: {
+        		      enabled: true
+        		    }   				
     			}]
 			});
 	})
