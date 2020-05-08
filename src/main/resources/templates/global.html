@@ -18,7 +18,7 @@
 	                         <a th:href="@{/global}"  class="nav-link">Global</a>
 	                    </li> 
 	                     <li class="nav-item active">
-	                         <a th:href="@{/continent}"  class="nav-link">Continent</a>
+	                         <a th:href="@{/continent}"  class="nav-link">Continents</a>
 	                    </li>   
 	                     <li class="nav-item active">
 	                         <a th:href="@{/countries}"  class="nav-link">Countries</a>
@@ -44,7 +44,7 @@
 			    text: "COVID-19 Worldwide"
 		  	},
 		  	subtitle: {
-		  		text: 'Total Confirmed: [[${totalConfirmed}]]' ,
+		  		text:  '<b>Total Confirmed</br>: [[${totalConfirmed}]] <br/> <b>Total Tests</br>: [[${totalTests}]]' ,
 		  	},
 		  	credits: false,
 		  	xAxis: {

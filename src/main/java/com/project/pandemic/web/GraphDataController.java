@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+//import org.springframework.core.ParameterizedTypeReference;
+//import org.springframework.http.HttpMethod;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.MediaType;
+//import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,15 +25,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.project.pandemic.domain.CountryData;
 import com.project.pandemic.domain.CountryDataRepository;
-import com.project.pandemic.domain.CountryLatest;
 import com.project.pandemic.domain.CountryTimeline;
 import com.project.pandemic.domain.CountryTimelineWrapper;
 import com.project.pandemic.domain.CountryUpdates;
 import com.project.pandemic.domain.CountryUpdatesRepository;
-import com.project.pandemic.domain.CountryUpdatesWrapper;
 import com.project.pandemic.domain.Timeline;
 import com.project.pandemic.domain.TimelineWrapper;
-import com.project.pandemic.domain.TodayNews;
+
 
 @Controller
 public class GraphDataController {
@@ -102,38 +102,20 @@ public class GraphDataController {
 		model.addAttribute("latestDate", df.format(latestDate));
 		model.addAttribute("totalConfirmed", confirmed);
 		
+		//Global total tests
+		List<CountryData> testsList = countryDataRepository.findByOrderByCountry();
+		int totalTests=0;
+		
+		for(CountryData country: testsList) {
+			totalTests += country.getTests();
+		}
+		model.addAttribute("totalTests", totalTests);
+		
 		return "global";
 	}
 
 	@GetMapping({"/continent"}) // continent view
 	public String continent(Model model) {
-
-		RestTemplate restTemplate = new RestTemplate();
-			    
-		ResponseEntity<CountryData[]> response = restTemplate.exchange(
-				"https://corona.lmao.ninja/v2/countries", HttpMethod.GET, null, CountryData[].class);
-		CountryData[] dataList = response.getBody();
-		HttpStatus statusCode = response.getStatusCode();
-		System.out.println(statusCode);
-		
-		countryDataRepository.deleteAll();		
-		for (CountryData countryData : dataList) {
-			
-			String country = countryData.getCountry();
-			String continent = countryData.getContinent();
-			Integer cases = countryData.getCases();
-			Integer deaths = countryData.getDeaths();
-			Integer critical = countryData.getCritical();
-			Integer recovered = countryData.getRecovered();
-			Integer active = countryData.getActive();
-			Integer tests = countryData.getTests();
-			Long updated = countryData.getUpdated();
-			countryData.setDate(updated);
-			Date date = countryData.getDate();
-				
-			//save to database
-			countryDataRepository.save(new CountryData(country, continent, cases, deaths, critical, recovered, active, tests, date));						
-		}
 		
 		List<CountryData> europe = countryDataRepository.findByContinent("Europe");
 		List<CountryData> asia = countryDataRepository.findByContinent("Asia");
@@ -343,28 +325,7 @@ public class GraphDataController {
 
 	@GetMapping("/countries") // All countries stats
 	public String countrySnapshot(Model model, String keyword) {
-		RestTemplate restTemplate = new RestTemplate();
-
-		CountryUpdatesWrapper response = restTemplate.getForObject("https://corona-api.com/countries",
-				CountryUpdatesWrapper.class);
-		List<CountryUpdates> countryUpdateList = response.getData();
 		
-		countryUpdatesRepository.deleteAll();
-		for (CountryUpdates countryUpdate : countryUpdateList) {
-
-			String name = countryUpdate.getName();
-			String code = countryUpdate.getCode();
-			Integer population = countryUpdate.getPopulation();
-			Date date = countryUpdate.getUpdated_at();
-			CountryLatest latestData = countryUpdate.getLatest_data();
-			TodayNews today = countryUpdate.getToday();
-			// log.info(countryUpdate.toString());
-
-			// save to database
-			countryUpdatesRepository.save(new CountryUpdates(name, code, population, date, latestData, today));
-
-		}
-
 		// extract GWT time of updating
 		CountryUpdates country = countryUpdatesRepository.findByName("UK");
 		model.addAttribute("UpdatedAt", df.format(country.getUpdated_at()));
@@ -423,7 +384,7 @@ public class GraphDataController {
 			Collections.reverse(recoveredData);
 			model.addAttribute("recovered", recoveredData);
 			
-			// Global total amount - the latest updates
+			// total amount - the latest updates
 			Timeline lastLine = timelines.get(0);
 			Date latestDate = lastLine.getDate();
 			Integer activeLast = lastLine.getActive();
@@ -440,7 +401,11 @@ public class GraphDataController {
 				model.addAttribute("totalDeaths", deathsLast);
 				model.addAttribute("totalRecovered", recoveredLast);
 				model.addAttribute("latestDate", df.format(latestDate));
-				model.addAttribute("totalConfirmed", confirmed);		
+				model.addAttribute("totalConfirmed", confirmed);	
+				
+			//total tests 
+				CountryData data = countryDataRepository.findByCountry(country);
+				model.addAttribute("totalTests", data.getTests());
 			
 		} else {
 			// System.out.println("There is no timeline indicated for country: "+ country);

@@ -16,12 +16,15 @@
 	                         <a th:href="@{/global}"  class="nav-link">Global</a>
 	                    </li> 
 	                     <li class="nav-item active">
-	                         <a th:href="@{/continent}"  class="nav-link">Continent</a>
+	                         <a th:href="@{/continent}"  class="nav-link">Continents</a>
 	                    </li>   
 	                     <li class="nav-item active">
 	                         <a th:href="@{/countries}"  class="nav-link">Countries</a>
 	                    </li>        			  				            			  				     
                 	</ul>
+                	 <ul class="nav navbar-nav-right">
+                	 	<li style ="font-style: italic; font-size:13px">*click on country name for visual</li>
+                	 </ul>
                 </div>	          		
 			     <form th:action="@{/countries}" method="get" class="form-inline  ml-auto">			
 						<label>Table Filter</label>&nbsp;&nbsp;
@@ -31,7 +34,7 @@
          </nav>      
         <div th:if="${message}" class="alert alert-warning alert-dismissible fade show" aria-label="Close">
 	        					<button class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-	        					<span th:text="${message}" style = "font-weight: bold"></span>
+	        					<span th:text="${message}" style = "font-weight: bold; font-style: italic; font-size:14px"></span>
 	    </div>    
 		<table class="table text-center table-responsive" id="countries">	  
 	    	<thead>
@@ -84,7 +87,7 @@
 	    	</tbody> 	
 	     </table> 
 	     <p class="content" th:inline="text" style ="font-style: italic; font-size:14px">
-				* Data Source: <a href="https://about-corona.net">ABOUT-CORONA.NET</a><br>
+				* Data Source: <a href="https://corona.lmao.ninja">The NovelCOVID API</a> and  <a href="https://about-corona.net">ABOUT-CORONA.NET</a><br>
 				* Updated at: [[${UpdatedAt}]]
 		</p>
 	  </div>	     
