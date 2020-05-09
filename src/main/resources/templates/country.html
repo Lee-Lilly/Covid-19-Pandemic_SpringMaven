@@ -28,7 +28,7 @@
 	    </nav>
    	      
    	     <div th:if="${message}" class="alert alert-warning alert-dismissible fade show" aria-label="Close">
-	        			<button class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+	        			<!--button class="close" data-dismiss="alert" aria-hidden="true">&times;</button-->
 	        			<span th:text="${message}" style = "font-weight: bold"></span></div>
 			<div id ="country-timeline" style="width:100%; height:100%;"></div>	
 					  
@@ -61,11 +61,14 @@
 	/*<![CDATA[*/
 	$(function () {
 		Highcharts.chart('country-timeline', {
+			lang:{
+				thousandsSep: ' '
+			},
 		  	title: {
 			    text: /*[[${countryName}]]*/[]
 		  	},
 		  	subtitle: {
-		  		text: '<b>Total Confirmed</br>: [[${totalConfirmed}]] <br/> <b>Total Tests</br>: [[${totalTests}]]' ,
+		  		text: '<b>Total Confirmed</br>: [[${totalConfirmed}]] <br/> <b>Total Tests</br>: [[${totalTests}]]<br/> <b>Confirmed Per Million</br>: [[${confirmedPerMillion}]]<br/>( Population: [[${population}]] )',
 		  	},
 		  	credits: false,
 		  	xAxis: {
@@ -125,7 +128,7 @@
         		      	y:  /*[[${totalRecovered}]]*/[],
         		     	      			
         			}],
-        			center: [100,60],
+        			center: [90,39],
         		    size: 100,
         		    showInLegend: false,
         		    dataLabels: {

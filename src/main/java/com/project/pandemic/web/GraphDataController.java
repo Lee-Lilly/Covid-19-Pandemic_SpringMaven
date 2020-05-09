@@ -32,7 +32,6 @@ import com.project.pandemic.domain.CountryUpdatesRepository;
 import com.project.pandemic.domain.Timeline;
 import com.project.pandemic.domain.TimelineWrapper;
 
-
 @Controller
 public class GraphDataController {
 	
@@ -342,6 +341,51 @@ public class GraphDataController {
 	@GetMapping(value = { "/search/{code}" }) // country timeline & totals
 	public String forceReturn(@PathVariable("code") String code, Model model, RedirectAttributes redirectAttributes) {
 		
+		//extract country name from code
+		CountryUpdates country = countryUpdatesRepository.findByCode(code);
+		String name = country.getName();			
+		model.addAttribute("countryName", name);
+		model.addAttribute("confirmedPerMillion", country.getLatest_data().getCalculated().getCases_per_million_population());
+		model.addAttribute("population", country.getPopulation());	
+		
+		//extract totals
+		CountryData data = countryDataRepository.findByCountry(name);
+		if (data != null) {
+			Date latestDate = data.getDate();
+			Integer activeTotal = data.getActive() ;
+			Integer deathsTotal = data.getDeaths();
+			Integer recoveredTotal = data.getRecovered();
+			Integer confirmedTotal = data.getCases();
+			Integer testsTotal = data.getTests();
+			
+//			System.out.println(df.format(latestDate));
+//			System.out.println(activeTotal);
+//			System.out.println(deathsTotal);
+//			System.out.println(recoveredTotal);
+//			System.out.println("Total tests: "+ testsTotal);
+			
+			model.addAttribute("totalActive", activeTotal);
+			model.addAttribute("totalDeaths", deathsTotal);
+			model.addAttribute("totalRecovered", recoveredTotal);
+			model.addAttribute("latestDate", df.format(latestDate));
+			model.addAttribute("totalConfirmed",confirmedTotal);
+			model.addAttribute("totalTests", testsTotal);																								
+		}
+		else {
+			CountryUpdates data2 = countryUpdatesRepository.findByName(name);
+			if(data2 != null) {
+				Integer confirmed = data2.getLatest_data().getConfirmed();
+				if (confirmed > 0) {
+					//alert message sent to countries table
+					redirectAttributes.addFlashAttribute("message", "No detailed data from " + name + ". Total Cases: " + confirmed);
+					return "redirect:../countries";						
+				}else {
+					//alert message sends to user session bookstore
+					redirectAttributes.addFlashAttribute("message", "No report from: " + name);
+					return "redirect:../countries";						
+				}
+			}
+		}
 		final String link = "https://corona-api.com/countries/" + code;
 
 		RestTemplate restTemplate = new RestTemplate();
@@ -350,10 +394,7 @@ public class GraphDataController {
 		// (https://corona-api.com/countries/{code})
 		CountryTimelineWrapper response3 = restTemplate.getForObject(link, CountryTimelineWrapper.class);
 		CountryTimeline value = response3.getData();
-		
-		String country = value.getName();
-		model.addAttribute("countryName", country);
-		
+						
 		List<Timeline> timelines = value.getTimeline();
 
 		if (timelines.isEmpty() == false) {
@@ -375,46 +416,22 @@ public class GraphDataController {
 				deathData.add(deaths);
 				recoveredData.add(recovered);
 			}
-			Collections.reverse(dates);
-			model.addAttribute("dates", dates);
-			Collections.reverse(activeData);
-			model.addAttribute("active", activeData);
-			Collections.reverse(deathData);
-			model.addAttribute("deaths", deathData);
-			Collections.reverse(recoveredData);
-			model.addAttribute("recovered", recoveredData);
-			
-			// total amount - the latest updates
-			Timeline lastLine = timelines.get(0);
-			Date latestDate = lastLine.getDate();
-			Integer activeLast = lastLine.getActive();
-			Integer deathsLast = lastLine.getDeaths();
-			Integer recoveredLast = lastLine.getRecovered();
-			Integer confirmed = lastLine.getConfirmed();
-
-//					System.out.println(df.format(latestDate));
-//					System.out.println(activeLast);
-//					System.out.println(deathsLast);
-//					System.out.println(recoveredLast);
-			
-				model.addAttribute("totalActive", activeLast);
-				model.addAttribute("totalDeaths", deathsLast);
-				model.addAttribute("totalRecovered", recoveredLast);
-				model.addAttribute("latestDate", df.format(latestDate));
-				model.addAttribute("totalConfirmed", confirmed);	
-				
-			//total tests 
-				CountryData data = countryDataRepository.findByCountry(country);
-				model.addAttribute("totalTests", data.getTests());
-			
-		} else {
-			// System.out.println("There is no timeline indicated for country: "+ country);
-			// alert message sent to country view
-			redirectAttributes.addFlashAttribute("message", "There is no valid data for " + country);
-			return "redirect:../countries";
+				Collections.reverse(dates);
+				model.addAttribute("dates", dates);
+				Collections.reverse(activeData);
+				model.addAttribute("active", activeData);
+				Collections.reverse(deathData);
+				model.addAttribute("deaths", deathData);
+				Collections.reverse(recoveredData);
+				model.addAttribute("recovered", recoveredData);
 		}
-		
-		return "country";
+		else {
+					System.out.println("There is no timeline indicated for this country.");
+					//alert message sent to country view
+					model.addAttribute("message", "There is no timeline indicated for " + name);
+		}
+			
+		return"country";
 	}
 
 }

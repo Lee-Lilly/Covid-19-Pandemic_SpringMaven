@@ -57,8 +57,7 @@ public class PandemicApplication {
 			
 			List<CountryData> dataList= Arrays.asList(response.getBody()); 
 //			System.out.println(dataList);
-			
-			countryDataRepository.deleteAll();		
+				
 			for (CountryData countryData : dataList) {
 				
 				String country = countryData.getCountry();
@@ -77,24 +76,6 @@ public class PandemicApplication {
 				countryDataRepository.save(new CountryData(country, continent, cases, deaths, critical, recovered, active, tests, date));						
 			}
 				
-//			//fetch global timeline from "ABOUT-CORONA.NET" (https://about-corona.net) //to save running time, fetch the online data.
-//			//Data source: "Johns Hopkins CSSE"
-//			TimelineWrapper response1 = restTemplate.getForObject("https://corona-api.com/timeline", TimelineWrapper.class); 
-//			List<Timeline> timelineList = response1.getData();
-//			
-//			for(Timeline timeline : timelineList) {
-//				
-//				Integer confirmed = timeline.getConfirmed();
-//				Integer deaths = timeline.getDeaths();
-//				Integer recovered = timeline.getRecovered();
-//				Integer active = timeline.getActive();
-//				Date date = timeline.getDate();
-//				
-//			//	log.info(timeline.toString());
-//			
-//				//save to database
-//				timelineRepository.save(new Timeline(confirmed, deaths, recovered, active, date));			
-//			}
 			
 			//fetch calculated updates for all countries from "ABOUT-CORONA.NET" (https://about-corona.net)
 			CountryUpdatesWrapper response2 = restTemplate.getForObject("https://corona-api.com/countries", CountryUpdatesWrapper.class);
